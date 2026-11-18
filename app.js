@@ -600,6 +600,28 @@
     dot.style.top = (T.mask.start.y * size) + 'px';
   }
 
+  /* 회색 글자를 지금 상태 그대로 다시 그린다 (글꼴이 늦게 왔을 때) */
+  function redrawGuideNow() {
+    if (!T || !T.char || !T.inkCanvas) return;
+    var guide = main.querySelector('.guide-canvas');
+    if (!guide) return;
+    drawGuide(guide.getContext('2d'), T.inkCanvas.width, T.char);
+    T.mask = buildMask(T.char);
+    T.path = buildPath(T.mask);
+    placeStartDot(document.getElementById('box-wrap'), T.cssSize);
+    if (T.strokes && T.strokes.length) validate();
+  }
+
+  /* Jua 글꼴을 확실히 불러온 뒤 회색 글자를 다시 그린다 (못 불러오면 시스템 글꼴로 계속) */
+  var guideFontTried = false;
+  function ensureGuideFont() {
+    if (guideFontTried || !document.fonts || !document.fonts.load) return;
+    guideFontTried = true;
+    try {
+      document.fonts.load('40px Jua').then(redrawGuideNow, function () {});
+    } catch (e) {}
+  }
+
   function initSyllable() {
     if (!T) return;
     T.strokes = [];
@@ -639,6 +661,7 @@
     updateDots();
     updateCoverageUI(0);
     setCoverLabel(0);
+    ensureGuideFont();
   }
 
   function updateNameRow() {
@@ -1278,16 +1301,7 @@
 
   /* 폰트가 늦게 준비되면 회색 글자를 다시 그린다 */
   if (document.fonts && document.fonts.ready) {
-    document.fonts.ready.then(function () {
-      if (!T) return;
-      var guide = main.querySelector('.guide-canvas');
-      if (guide && T.inkCanvas) {
-        drawGuide(guide.getContext('2d'), T.inkCanvas.width, T.char);
-        T.mask = buildMask(T.char);
-        T.path = buildPath(T.mask);
-        placeStartDot(document.getElementById('box-wrap'), T.cssSize);
-      }
-    });
+    document.fonts.ready.then(redrawGuideNow, function () {});
   }
 
   /* 테스트용 도우미 (#debug) */
