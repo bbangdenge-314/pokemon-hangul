@@ -1,19 +1,33 @@
-/* 포켓몬 한글 대모험 - 학습 데이터 */
+/* 포켓몬 한글 따라쓰기 - 학습 데이터 (이름·이미지 ID는 PokeAPI 공식 한국어 명칭으로 확인) */
 window.POKE_DATA = (function () {
   'use strict';
 
   var POKEMON = {
     1: { name: '이상해씨' },
+    2: { name: '이상해풀' },
+    6: { name: '리자몽' },
     4: { name: '파이리' },
     7: { name: '꼬부기' },
     25: { name: '피카츄' },
+    26: { name: '라이츄' },
+    35: { name: '삐삐' },
     39: { name: '푸린' },
+    54: { name: '고라파덕' },
+    79: { name: '야돈' },
+    84: { name: '두두' },
+    86: { name: '쥬쥬' },
+    94: { name: '팬텀' },
     131: { name: '라프라스' },
+    132: { name: '메타몽' },
     133: { name: '이브이' },
     143: { name: '잠만보' },
     149: { name: '망나뇽' },
     150: { name: '뮤츠' },
-    151: { name: '뮤' }
+    151: { name: '뮤' },
+    152: { name: '치코리타' },
+    172: { name: '피츄' },
+    175: { name: '토게피' },
+    658: { name: '개굴닌자' }
   };
 
   var ARTWORK = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
@@ -23,99 +37,98 @@ window.POKE_DATA = (function () {
   function spriteUrl(id) { return SPRITE + id + '.png'; }
 
   /* 단계를 깰 때 잡는 포켓몬 */
-  var REWARDS = { 1: 1, 2: 7, 3: 4, 4: 133, 5: 25 };
+  var REWARDS = { 1: 35, 2: 175, 3: 86, 4: 132, 5: 6 };
   /* 모든 단계를 깨면 찾아오는 전설의 포켓몬 */
   var BONUS = 151;
 
+  /*
+    문제 = { id: 포켓몬 번호, trace: 따라 쓸 글자 위치(0부터) }
+    trace에 없는 글자는 미리 채워진 글자로 보여 준다.
+  */
   var STAGES = [
     {
       id: 1,
-      title: '모음 친구들',
-      subtitle: '아 야 어 여 오 요 우 유',
-      icon: '🎵',
+      title: '첫 글자 따라 쓰기',
+      subtitle: '이름의 첫 글자 한 글자',
+      icon: '✏️',
       theme: '#ff8fab',
-      tip: '소리를 잘 듣고 똑같은 모음을 찾아요',
+      tip: '포켓몬 이름의 첫 글자를 손가락으로 따라 써요',
+      hint: '회색 글자 위를 손가락으로 따라 그어요',
       questions: [
-        { type: 'listen', say: '아', answer: 'ㅏ', options: ['ㅏ', 'ㅓ', 'ㅗ', 'ㅜ'] },
-        { type: 'listen', say: '야', answer: 'ㅑ', options: ['ㅑ', 'ㅏ', 'ㅕ', 'ㅛ'] },
-        { type: 'listen', say: '어', answer: 'ㅓ', options: ['ㅓ', 'ㅗ', 'ㅜ', 'ㅏ'] },
-        { type: 'listen', say: '여', answer: 'ㅕ', options: ['ㅕ', 'ㅓ', 'ㅑ', 'ㅠ'] },
-        { type: 'listen', say: '오', answer: 'ㅗ', options: ['ㅗ', 'ㅜ', 'ㅏ', 'ㅓ'] },
-        { type: 'listen', say: '요', answer: 'ㅛ', options: ['ㅛ', 'ㅑ', 'ㅠ', 'ㅗ'] },
-        { type: 'listen', say: '우', answer: 'ㅜ', options: ['ㅜ', 'ㅗ', 'ㅠ', 'ㅏ'] },
-        { type: 'listen', say: '유', answer: 'ㅠ', options: ['ㅠ', 'ㅛ', 'ㅜ', 'ㅕ'] }
+        { id: 151, trace: [0] },   /* 뮤 */
+        { id: 39, trace: [0] },    /* 푸린 → 푸 */
+        { id: 25, trace: [0] },    /* 피카츄 → 피 */
+        { id: 7, trace: [0] },     /* 꼬부기 → 꼬 */
+        { id: 4, trace: [0] },     /* 파이리 → 파 */
+        { id: 133, trace: [0] }    /* 이브이 → 이 */
       ]
     },
     {
       id: 2,
-      title: '자음 탐험',
-      subtitle: 'ㄱ ㄴ ㄷ ㄹ ㅁ ㅂ ㅅ ㅇ',
-      icon: '🧭',
+      title: '두 글자 이름',
+      subtitle: '짧은 이름을 통째로',
+      icon: '🙌',
       theme: '#4dabf7',
-      tip: '소리를 잘 듣고 첫소리를 찾아요',
+      tip: '두 글자 이름을 처음부터 끝까지 따라 써요',
+      hint: '한 글자씩 차례대로 따라 써요',
       questions: [
-        { type: 'consonant', say: '기역, 그', answer: 'ㄱ', options: ['ㄱ', 'ㄴ', 'ㄷ', 'ㅁ'] },
-        { type: 'consonant', say: '니은, 느', answer: 'ㄴ', options: ['ㄴ', 'ㄷ', 'ㄹ', 'ㅁ'] },
-        { type: 'consonant', say: '디귿, 드', answer: 'ㄷ', options: ['ㄷ', 'ㄱ', 'ㄹ', 'ㅂ'] },
-        { type: 'consonant', say: '리을, 르', answer: 'ㄹ', options: ['ㄹ', 'ㄴ', 'ㅁ', 'ㅇ'] },
-        { type: 'consonant', say: '미음, 므', answer: 'ㅁ', options: ['ㅁ', 'ㅂ', 'ㄴ', 'ㄷ'] },
-        { type: 'consonant', say: '비읍, 브', answer: 'ㅂ', options: ['ㅂ', 'ㅁ', 'ㅅ', 'ㅇ'] },
-        { type: 'consonant', say: '시옷, 스', answer: 'ㅅ', options: ['ㅅ', 'ㅂ', 'ㅇ', 'ㄷ'] },
-        { type: 'consonant', say: '이응, 응', answer: 'ㅇ', options: ['ㅇ', 'ㅅ', 'ㄱ', 'ㅁ'] }
+        { id: 39, trace: [0, 1] },   /* 푸린 */
+        { id: 172, trace: [0, 1] },  /* 피츄 */
+        { id: 79, trace: [0, 1] },   /* 야돈 */
+        { id: 84, trace: [0, 1] },   /* 두두 */
+        { id: 94, trace: [0, 1] },   /* 팬텀 */
+        { id: 150, trace: [0, 1] }   /* 뮤츠 */
       ]
     },
     {
       id: 3,
-      title: '글자 합체!',
-      subtitle: 'ㄱ + ㅏ = 가',
-      icon: '✨',
+      title: '빈칸 따라 쓰기',
+      subtitle: '이름에서 빠진 글자',
+      icon: '🧩',
       theme: '#845ef7',
-      tip: '첫소리와 모음이 만나면 어떤 글자가 될까요?',
+      tip: '이름에서 빠진 글자를 찾아 따라 써요',
+      hint: '노란 빈칸 글자를 따라 써요',
       questions: [
-        { type: 'combine', consonant: 'ㄱ', vowel: 'ㅏ', answer: '가', options: ['가', '나', '다', '라'] },
-        { type: 'combine', consonant: 'ㄴ', vowel: 'ㅗ', answer: '노', options: ['노', '도', '로', '모'] },
-        { type: 'combine', consonant: 'ㄷ', vowel: 'ㅣ', answer: '디', options: ['디', '기', '니', '리'] },
-        { type: 'combine', consonant: 'ㄹ', vowel: 'ㅜ', answer: '루', options: ['루', '누', '무', '두'] },
-        { type: 'combine', consonant: 'ㅁ', vowel: 'ㅏ', answer: '마', options: ['마', '바', '사', '자'] },
-        { type: 'combine', consonant: 'ㅂ', vowel: 'ㅓ', answer: '버', options: ['버', '서', '저', '거'] },
-        { type: 'combine', consonant: 'ㅅ', vowel: 'ㅗ', answer: '소', options: ['소', '보', '도', '고'] },
-        { type: 'combine', consonant: 'ㅈ', vowel: 'ㅏ', answer: '자', options: ['자', '차', '카', '타'] }
+        { id: 25, trace: [2] },    /* 피카[츄] */
+        { id: 4, trace: [2] },     /* 파이[리] */
+        { id: 7, trace: [2] },     /* 꼬부[기] */
+        { id: 143, trace: [2] },   /* 잠만[보] */
+        { id: 54, trace: [3] },    /* 고라파[덕] */
+        { id: 149, trace: [2] }    /* 망나[뇽] */
       ]
     },
     {
       id: 4,
-      title: '이름 첫 글자',
-      subtitle: '포켓몬 이름을 듣고 첫 글자를 찾아요',
-      icon: '🔍',
+      title: '세 글자 이름',
+      subtitle: '이름 전체를 따라 쓰기',
+      icon: '💪',
       theme: '#f59f00',
-      tip: '이름을 듣고 첫 글자를 골라요',
+      tip: '세 글자 이름을 순서대로 다 따라 써요',
+      hint: '세 글자를 차례대로 따라 써요',
       questions: [
-        { type: 'first', pokemon: 25, answer: '피', options: ['피', '파', '꼬', '이'] },
-        { type: 'first', pokemon: 4, answer: '파', options: ['파', '피', '바', '아'] },
-        { type: 'first', pokemon: 7, answer: '꼬', options: ['꼬', '고', '포', '도'] },
-        { type: 'first', pokemon: 1, answer: '이', options: ['이', '리', '시', '지'] },
-        { type: 'first', pokemon: 133, answer: '이', options: ['이', '브', '비', '미'] },
-        { type: 'first', pokemon: 39, answer: '푸', options: ['푸', '부', '프', '투'] },
-        { type: 'first', pokemon: 143, answer: '잠', options: ['잠', '삼', '참', '담'] },
-        { type: 'first', pokemon: 151, answer: '뮤', options: ['뮤', '무', '유', '뷰'] }
+        { id: 25, trace: [0, 1, 2] },   /* 피카츄 */
+        { id: 4, trace: [0, 1, 2] },    /* 파이리 */
+        { id: 7, trace: [0, 1, 2] },    /* 꼬부기 */
+        { id: 133, trace: [0, 1, 2] },  /* 이브이 */
+        { id: 26, trace: [0, 1, 2] },   /* 라이츄 */
+        { id: 149, trace: [0, 1, 2] }   /* 망나뇽 */
       ]
     },
     {
       id: 5,
-      title: '이름 완성!',
-      subtitle: '빈칸에 들어갈 글자를 찾아요',
+      title: '네 글자 도전!',
+      subtitle: '긴 이름에 도전',
       icon: '🏆',
       theme: '#20c997',
-      tip: '이름을 듣고 빈칸에 들어갈 글자를 골라요',
+      tip: '긴 네 글자 이름에 도전해 봐요',
+      hint: '네 글자를 차근차근 따라 써요',
       questions: [
-        { type: 'fill', pokemon: 25, blank: 2, answer: '츄', options: ['츄', '추', '초', '치'] },
-        { type: 'fill', pokemon: 7, blank: 1, answer: '부', options: ['부', '보', '브', '구'] },
-        { type: 'fill', pokemon: 1, blank: 3, answer: '씨', options: ['씨', '시', '세', '새'] },
-        { type: 'fill', pokemon: 133, blank: 1, answer: '브', options: ['브', '비', '부', '보'] },
-        { type: 'fill', pokemon: 143, blank: 1, answer: '만', options: ['만', '맘', '반', '문'] },
-        { type: 'fill', pokemon: 150, blank: 1, answer: '츠', options: ['츠', '추', '초', '치'] },
-        { type: 'fill', pokemon: 149, blank: 2, answer: '뇽', options: ['뇽', '냥', '녕', '용'] },
-        { type: 'fill', pokemon: 131, blank: 1, answer: '프', options: ['프', '파', '푸', '브'] }
+        { id: 1, trace: [0, 1, 2, 3] },     /* 이상해씨 */
+        { id: 131, trace: [0, 1, 2, 3] },   /* 라프라스 */
+        { id: 54, trace: [0, 1, 2, 3] },    /* 고라파덕 */
+        { id: 658, trace: [0, 1, 2, 3] },   /* 개굴닌자 */
+        { id: 2, trace: [0, 1, 2, 3] },     /* 이상해풀 */
+        { id: 152, trace: [0, 1, 2, 3] }    /* 치코리타 */
       ]
     }
   ];

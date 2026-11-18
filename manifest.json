@@ -1,7 +1,7 @@
 {
-  "name": "포켓몬 한글 대모험",
-  "short_name": "포켓몬 한글",
-  "description": "포켓몬과 함께 배우는 5살 한글 놀이",
+  "name": "포켓몬 한글 따라쓰기",
+  "short_name": "포켓몬 따라쓰기",
+  "description": "포켓몬 이름을 손가락으로 따라 쓰는 5살 한글 놀이",
   "lang": "ko",
   "start_url": "./index.html",
   "scope": "./",
