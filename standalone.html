@@ -617,6 +617,20 @@ input { font-family: inherit; }
   from { opacity: 0; transform: translateY(7px) scale(.9); }
   to { opacity: 1; transform: translateY(0) scale(1); }
 }
+.art-cry {
+  position: absolute;
+  top: -3px;
+  right: -3px;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 2px 0 #ffe0ee, inset 0 0 0 2px #fff5fa;
+  font-size: 12px;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
 .art-badge {
   position: absolute;
   bottom: -4px;
@@ -3133,6 +3147,7 @@ window.POKE_DATA = (function () {
       '<button class="poke-art" data-act="cry" data-id="' + q.id + '" aria-label="' + pkm.name + ' 울음소리">' +
       pokeImg(q.id, 'strip-poke') +
       '<span class="art-badge">' + genLabel(q.id) + '</span>' +
+      '<span class="art-cry" aria-hidden="true">🔊</span>' +
       '</button>' +
       '<div class="poke-body">' +
       '<div class="name-row' + nameRowClass(chars.length) + '" id="name-row">' + nameRowHTML(chars, targets, 0) + '</div>' +

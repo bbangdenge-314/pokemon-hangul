@@ -602,6 +602,7 @@
       '<button class="poke-art" data-act="cry" data-id="' + q.id + '" aria-label="' + pkm.name + ' 울음소리">' +
       pokeImg(q.id, 'strip-poke') +
       '<span class="art-badge">' + genLabel(q.id) + '</span>' +
+      '<span class="art-cry" aria-hidden="true">🔊</span>' +
       '</button>' +
       '<div class="poke-body">' +
       '<div class="name-row' + nameRowClass(chars.length) + '" id="name-row">' + nameRowHTML(chars, targets, 0) + '</div>' +
