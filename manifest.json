@@ -1,0 +1,20 @@
+{
+  "name": "포켓몬 한글 대모험",
+  "short_name": "포켓몬 한글",
+  "description": "포켓몬과 함께 배우는 5살 한글 놀이",
+  "lang": "ko",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#7ed0ff",
+  "theme_color": "#7ed0ff",
+  "icons": [
+    {
+      "src": "icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
