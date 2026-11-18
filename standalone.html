@@ -2610,8 +2610,10 @@ window.POKE_DATA = (function () {
       }
     }
     if (!raw) return;
+    var migrated = false;
     try {
       var s = JSON.parse(raw);
+      migrated = !localStorage.getItem(KEY);
       if (!s || typeof s !== 'object') return;
       state = Object.assign(defaultState(), s);
       if (!Array.isArray(state.caught)) state.caught = [];
@@ -2620,6 +2622,7 @@ window.POKE_DATA = (function () {
       state.unlocked = Math.min(STAGES.length, Math.max(1, Number(state.unlocked) || 1));
       state.gen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].indexOf(Number(state.gen)) !== -1 ? Number(state.gen) : 0;
       state.muted = !!state.muted;
+      if (migrated) saveState();   /* v3 기록을 v4 키로 옮겨 둔다 */
     } catch (e) {
       state = defaultState();
     }
@@ -2939,6 +2942,7 @@ window.POKE_DATA = (function () {
   var tokenSeq = 0;
   var dexState = { gen: 0, q: '', shown: 0, list: [] };
   var dexFrom = 'map';   /* 도감을 어디서 열었는지 (뒤로 가면 그리로) */
+  var dexObserver = null;
 
   function setHud(title) {
     if (!title) { hud.hidden = true; hud.innerHTML = ''; return; }
@@ -4133,6 +4137,19 @@ window.POKE_DATA = (function () {
       '</section>';
     main.innerHTML = html;
     renderDexGrid(true);
+    /* 아래까지 내리면 다음 묶음을 저절로 이어서 보여 준다 */
+    try {
+      if (dexObserver) dexObserver.disconnect();
+      var more = document.getElementById('dex-more');
+      if (more && 'IntersectionObserver' in window) {
+        dexObserver = new IntersectionObserver(function (entries) {
+          entries.forEach(function (en) {
+            if (en.isIntersecting && view === 'dex') renderDexGrid(false);
+          });
+        }, { root: main, rootMargin: '120px' });
+        dexObserver.observe(more);
+      }
+    } catch (e) {}
     var input = document.getElementById('dex-search');
     if (input) {
       input.addEventListener('input', function () {
