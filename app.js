@@ -477,7 +477,7 @@
     var byH = (tm && tm.clientHeight > 120)
       ? tm.clientHeight - extra
       : (window.innerHeight - 430);
-    return Math.max(168, Math.round(Math.min(byW, byH, 330)));
+    return Math.max(168, Math.round(Math.min(byW, byH, 400)));
   }
 
   var MASK_L = 96;
