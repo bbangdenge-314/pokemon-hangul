@@ -1,4 +1,4 @@
-/* 포켓몬 한글 따라쓰기 - 학습 데이터 (v4)
+/* 포켓몬 한글 따라쓰기 - 학습 데이터 (v4.1)
    - pokemon-data.js 의 전국도감 1~1025 를 쓰기 좋은 모양으로 다듬고
    - 6단계 문제를 그때그때 뽑는 규칙(문제 은행)을 담습니다.
    - 모든 포켓몬은 어느 단계에서는 꼭 나올 수 있습니다 (1,025마리 전부). */
@@ -198,27 +198,89 @@ window.POKE_DATA = (function () {
   }
 
   /*
+    세대를 뽑는 순서를 무작위로 만든다.
+    - 후보가 많은 세대가 조금 더 자주 앞에 오게 제곱근 가중치를 준다
+      (그냥 같은 확률로 두면 후보가 한 마리뿐인 세대가 지나치게 자주 나온다)
+    - 어떤 세대도 빠지지 않도록 한 번 뽑은 세대는 빼고 끝까지 뽑는다 (비복원 추출)
+  */
+  function shuffleGens(queue, r) {
+    var left = Object.keys(queue).map(Number);
+    var weight = {};
+    var leftTotal = 0;
+    left.forEach(function (g) { weight[g] = Math.sqrt(queue[g].length); leftTotal += weight[g]; });
+    var order = [];
+    while (left.length) {
+      var x = r() * leftTotal;
+      var idx = left.length - 1;
+      for (var i = 0; i < left.length; i++) {
+        x -= weight[left[i]];
+        if (x <= 0) { idx = i; break; }
+      }
+      var g = left[idx];
+      order.push(g);
+      leftTotal -= weight[g];
+      left.splice(idx, 1);
+    }
+    return order;
+  }
+
+  /*
     단계 문제 n개를 뽑는다.
     - 이미 잡은 포켓몬보다 아직 못 만난 포켓몬을 먼저 넣어 도감이 골고루 채워지게 한다
+      (그 안에서도 완전 무작위 셔플)
     - 같은 단계 안에서 같은 포켓몬이 두 번 나오지 않는다
+    - 세대를 고르지 않았을 때(전체)는 1~9세대를 번갈아 뽑아, 한 라운드가 여러 세대로 섞인다
   */
   function makeQuestions(sid, gen, n, isCaught, rand) {
     var s = STAGES.filter(function (x) { return x.id === sid; })[0];
     if (!s) return [];
     var r = rand || Math.random;
     var pool = stagePool(sid, gen);
-    var fresh = [];
-    var seen = [];
+    if (!pool.length) return [];
+
+    /* 세대별 대기열: [아직 못 만난 포켓몬(섞음) ... 이미 잡은 포켓몬(섞음)] */
+    var byGen = {};
     shuffle(pool.slice(), r).forEach(function (id) {
-      if (typeof isCaught === 'function' && isCaught(id)) seen.push(id);
-      else fresh.push(id);
+      var g = genOf(id);
+      if (!byGen[g]) byGen[g] = { fresh: [], seen: [] };
+      if (typeof isCaught === 'function' && isCaught(id)) byGen[g].seen.push(id);
+      else byGen[g].fresh.push(id);
     });
-    var list = fresh.concat(seen);
-    var want = Math.min(n || s.count, list.length);
+    var queue = {};
+    Object.keys(byGen).forEach(function (g) {
+      queue[g] = byGen[g].fresh.concat(byGen[g].seen);
+    });
+
+    var want = Math.min(n || s.count, pool.length);
+    var picked = [];
+    if (gen) {
+      /* 한 세대만 고른 경우: 그 세대 후보에서 완전 무작위 */
+      picked = (queue[gen] || []).slice(0, want);
+    } else {
+      /* 전체: 세대 순서를 무작위로 섞고, 한 바퀴에 세대마다 한 마리씩 뽑는다.
+         아직 못 만난 포켓몬을 다 쓰고 나서야 이미 잡은 포켓몬을 넣는다. */
+      var order = shuffleGens(queue, r);
+      var cursor = { fresh: {}, seen: {} };
+      ['fresh', 'seen'].forEach(function (kind) {
+        while (picked.length < want) {
+          var added = false;
+          for (var k = 0; k < order.length && picked.length < want; k++) {
+            var g2 = order[k];
+            var list = byGen[g2][kind];
+            var i = cursor[kind][g2] || 0;
+            if (i < list.length) { picked.push(list[i]); cursor[kind][g2] = i + 1; added = true; }
+          }
+          if (!added) break;
+        }
+      });
+      /* 세대가 늘 같은 자리에 오지 않도록 뽑힌 순서도 한 번 더 섞는다 */
+      shuffle(picked, r);
+    }
+
     var out = [];
-    for (var i = 0; i < want; i++) {
-      var p = POKEMON[list[i]];
-      out.push({ id: list[i], trace: s.trace(p, r) });
+    for (var j = 0; j < picked.length; j++) {
+      var p = POKEMON[picked[j]];
+      out.push({ id: picked[j], trace: s.trace(p, r) });
     }
     return out;
   }
@@ -246,6 +308,7 @@ window.POKE_DATA = (function () {
     stagePool: stagePool,
     stageAvailable: stageAvailable,
     makeQuestions: makeQuestions,
-    shuffle: shuffle
+    shuffle: shuffle,
+    shuffleGens: shuffleGens
   };
 })();

@@ -196,6 +196,54 @@ def main():
         check("6단계 문제 4개·중복 없음", len(qdata["s6"]) == 4 and len(set(qdata["s6"])) == 4, qdata["s6"])
         check("문제의 포켓몬이 모두 도감에 있음", len(qdata["bad"]) == 0, qdata["bad"])
 
+        # ---------- 1-b. 전체 세대 랜덤 출제 ----------
+        # 전체(0)로 두었을 때 한 라운드가 1~9세대에 골고루 섞이고, 매번 다른 조합이 나오는지
+        mix = page.evaluate("""() => {
+            const D = window.POKE_DATA;
+            const perStage = {};
+            let sameOrder = false;
+            for (const s of D.STAGES) {
+              const dist = {};
+              let minDistinct = 99, total = 0, first = null, repeats = 0;
+              for (let t = 0; t < 200; t++) {
+                const gens = D.makeQuestions(s.id, 0, s.count, () => false).map(q => D.genOf(q.id));
+                const key = gens.join(',');
+                if (first === null) first = key; else if (key === first) repeats++;
+                minDistinct = Math.min(minDistinct, new Set(gens).size);
+                gens.forEach(g => { dist[g] = (dist[g] || 0) + 1; total++; });
+              }
+              const share = {};
+              Object.keys(dist).forEach(g => { share[g] = +(dist[g] / total).toFixed(3); });
+              perStage[s.id] = {count: s.count, minDistinct, repeats, total, share,
+                                gens: Object.keys(dist).map(Number).sort((a, b) => a - b)};
+              if (repeats > 3) sameOrder = true;
+            }
+            const g5 = D.makeQuestions(3, 5, 6, () => false).map(q => D.genOf(q.id));
+            const poolIds = D.stagePool(1, 0);
+            const g3pool = D.stagePool(1, 3);
+            const caught3 = new Set(g3pool.slice(0, g3pool.length - 20));   // 3세대는 20마리만 아직 못 만남
+            const freshRound = D.makeQuestions(1, 3, 6, id => caught3.has(id)).map(q => q.id);
+            const two = [D.makeQuestions(1, 0, 6, () => false).map(q => q.id),
+                         D.makeQuestions(1, 0, 6, () => false).map(q => q.id)];
+            return {perStage, sameOrder, g5, freshRound,
+                    freshHit: freshRound.filter(id => !caught3.has(id)).length,
+                    different: two[0].join(',') !== two[1].join(',')};
+        }""")
+        per = {int(k): v for k, v in mix["perStage"].items()}
+        check("전체 세대: 라운드마다 1~9세대가 서로 다르게 섞임 (모든 단계)",
+              all(v["minDistinct"] == min(v["count"], 9) for v in per.values()),
+              {k: v["minDistinct"] for k, v in per.items()})
+        check("전체 세대: 200라운드마다 9세대 모두 나옴 (특정 세대 몰림 없음)",
+              all(v["gens"] == list(range(1, 10)) for v in per.values()),
+              {k: v["gens"] for k, v in per.items()})
+        even = all(0.03 <= s <= 0.30 for v in per.values() for s in v["share"].values())
+        check("전체 세대: 세대별 출제 비중이 고루 (3~30%)", even,
+              {k: v["share"] for k, v in per.items() if k in (1, 2)})
+        check("전체 세대: 다음 라운드는 앞 라운드와 다른 문제", mix["different"])
+        check("전체 세대: 매번 같은 순서가 반복되지 않음", not mix["sameOrder"])
+        check("세대를 고르면 그 세대 포켓몬만", mix["g5"] and set(mix["g5"]) == {5}, mix["g5"])
+        check("아직 못 만난 포켓몬을 먼저 뽑음", mix["freshHit"] == 6, mix["freshRound"])
+
         # ---------- 2. 울음소리 파일 ----------
         audio = page.evaluate("""async () => {
             const AC = new (window.AudioContext || window.webkitAudioContext)();
@@ -426,7 +474,21 @@ def main():
         page.wait_for_timeout(500)
         q3 = page.evaluate("() => window.__trace.questions().map(id => window.POKE_DATA.POKEMON[id].gen)")
         check("고른 세대 포켓몬만 문제로 나옴", q3 and set(q3) == {3}, q3)
+        hud3 = page.evaluate("() => (document.querySelector('.hud-title') || {}).textContent || ''")
+        check("고른 세대는 문제 화면 위에 표시", "3세대" in hud3, hud3)
+
+        # 전체로 되돌리면 화면에 실제로 여러 세대가 섞여 나오는지 (배지로 확인)
         page.evaluate("() => window.__trace.setGen(0)")
+        ui_gens = []
+        for _ in range(6):
+            page.evaluate("() => window.__trace.goto(1)")
+            page.wait_for_timeout(320)
+            badge = page.evaluate("() => (document.querySelector('.art-badge') || {}).textContent || ''")
+            ui_gens.append(badge.strip())
+        check("전체 세대: 화면에 여러 세대가 섞여 나옴 (6번 중 3가지 이상)", len(set(ui_gens)) >= 3, ui_gens)
+        check("전체 세대: 9세대만 나오지 않음", set(ui_gens) != {"9세대"}, ui_gens)
+        hud0 = page.evaluate("() => (document.querySelector('.hud-title') || {}).textContent || ''")
+        check("전체 세대일 때는 세대 표시 없음", "세대" not in hud0, hud0)
 
         # ---------- 12. 도감 ----------
         page.evaluate("() => { const b = document.querySelector('[data-act=\"back\"]'); if (b) b.click(); }")
@@ -455,6 +517,8 @@ def main():
             gens: [...new Set([...document.querySelectorAll('.dex-item')].map(i => window.POKE_DATA.POKEMON[Number(i.dataset.id)].gen))]
         })""")
         check("9세대 필터 = 120마리", d9["total"] == 120 and d9["gens"] == [9], d9)
+        dscope = page.evaluate("() => window.__trace.pool(1)")
+        check("도감 세대 필터는 문제 출제 세대를 바꾸지 않음", dscope >= 1000, dscope)
         page.evaluate("() => window.__trace.dexSearch('피카츄')")
         page.wait_for_timeout(400)
         search1 = page.evaluate("""() => [...document.querySelectorAll('.dex-item')].map(i => Number(i.dataset.id))""")
@@ -546,6 +610,36 @@ def main():
         check("잡은 포켓몬이 모두 도감에 있는 번호", all(1 <= int(i) <= 1025 for i in saved["caught"]), saved["caught"])
         rcry = page.evaluate("() => window.__trace.lastCry()")
         check("보상 포켓몬도 울음소리", rcry and rcry["id"] == 175, rcry)
+
+        # ---------- 13-b. 예전에 한 세대로 고정된 기록 ----------
+        page.evaluate("""() => {
+            const raw = JSON.parse(localStorage.getItem('%s') || '{}');
+            raw.gen = 9; delete raw.ver;
+            localStorage.setItem('%s', JSON.stringify(raw));
+        }""" % (KEY, KEY))
+        page.goto(base_url + "?stale=1#debug", wait_until="load")
+        page.wait_for_timeout(800)
+        page.evaluate("() => { const b = document.querySelector('[data-act=\"start\"]'); if (b) b.click(); }")
+        page.wait_for_timeout(400)
+        stale = page.evaluate("""() => ({
+            on: document.querySelector('.gen-chip.on') ? document.querySelector('.gen-chip.on').getAttribute('data-gen') : null,
+            pool: window.__trace.pool(1),
+            kept: window.__trace.caughtIds().length,
+            ver: JSON.parse(localStorage.getItem('%s') || '{}').ver || 0
+        })""" % KEY)
+        check("예전에 9세대로 고정된 기록은 전체로 되돌아옴", stale["on"] == "0" and stale["pool"] >= 1000 and stale["ver"] == 5, stale)
+        check("세대를 되돌려도 잡은 포켓몬은 그대로", stale["kept"] == 7, stale)
+        page.evaluate("() => { document.querySelector('.gen-chip[data-gen=\"4\"]').click(); }")
+        page.wait_for_timeout(400)
+        page.goto(base_url + "?kept=1#debug", wait_until="load")
+        page.wait_for_timeout(800)
+        page.evaluate("() => { const b = document.querySelector('[data-act=\"start\"]'); if (b) b.click(); }")
+        page.wait_for_timeout(400)
+        kept = page.evaluate("""() => ({
+            on: document.querySelector('.gen-chip.on') ? document.querySelector('.gen-chip.on').getAttribute('data-gen') : null,
+            pool: window.__trace.pool(1)
+        })""")
+        check("새로 고른 세대는 다시 열어도 유지", kept["on"] == "4" and kept["pool"] < 200, kept)
 
         # ---------- 14. 한 파일(standalone) 버전 ----------
         page.goto(f"http://127.0.0.1:{port}/standalone.html#debug", wait_until="load")

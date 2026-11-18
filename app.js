@@ -25,6 +25,8 @@
   var stagePool = D.stagePool;
 
   var KEY = 'pokemon-hangul-v4';
+  /* 저장 형식 번호. 5부터: 예전 판에서 도감 세대 칩 때문에 한 세대로 고정된 기록은 한 번 전체로 되돌린다 */
+  var STATE_VER = 5;
   var OLD_KEYS = ['pokemon-hangul-trace-v3'];
   var main = document.getElementById('main');
   var hud = document.getElementById('hud');
@@ -49,7 +51,7 @@
 
   /* ---------------- 상태 저장 ---------------- */
   function defaultState() {
-    return { unlocked: 1, cleared: {}, caught: [], muted: false, gen: 0 };
+    return { unlocked: 1, cleared: {}, caught: [], muted: false, gen: 0, ver: STATE_VER };
   }
   var state = defaultState();
 
@@ -77,7 +79,14 @@
       state.unlocked = Math.min(STAGES.length, Math.max(1, Number(state.unlocked) || 1));
       state.gen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].indexOf(Number(state.gen)) !== -1 ? Number(state.gen) : 0;
       state.muted = !!state.muted;
-      if (migrated) saveState();   /* v3 기록을 v4 키로 옮겨 둔다 */
+      /* 예전 판(v4 초기)은 도감의 세대 칩이 문제 출제 세대까지 바꿔 놓아, 한 세대만 나오는 것처럼 보였다.
+         그렇게 남은 세대 고정은 한 번만 전체로 되돌리고, 이후에 고른 세대는 그대로 지킨다. */
+      if ((Number(s.ver) || 0) < STATE_VER) {
+        state.gen = 0;
+        migrated = true;
+      }
+      state.ver = STATE_VER;
+      if (migrated) saveState();   /* v3 기록을 v4 키로 옮기고, 형식을 새로 저장한다 */
     } catch (e) {
       state = defaultState();
     }
@@ -592,7 +601,7 @@
     var total = stage.questions.length;
     var blank = s.guide === 'blank';
 
-    setHud(s.title);
+    setHud(s.title + (state.gen ? ' · ' + state.gen + '세대' : ''));
     hud.style.setProperty('--theme', s.theme);
 
     main.innerHTML =
@@ -1847,8 +1856,6 @@
         break;
       case 'dex-gen': {
         dexState.gen = Number(t.getAttribute('data-gen')) || 0;
-        state.gen = dexState.gen;
-        saveState();
         goDex();
         break;
       }

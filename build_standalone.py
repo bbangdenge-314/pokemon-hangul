@@ -12,10 +12,10 @@ app = (base / 'app.js').read_text(encoding='utf-8')
 for src in (css, pdata, data, app):
     assert '</script>' not in src, 'script 태그를 닫는 문자열이 들어 있습니다'
 
-html = html.replace('<link rel="stylesheet" href="style.css?v=4">', '<style>\n' + css + '\n</style>')
-html = html.replace('<script src="pokemon-data.js?v=4"></script>', '<script>\n' + pdata + '\n</script>')
-html = html.replace('<script src="data.js?v=4"></script>', '<script>\n' + data + '\n</script>')
-html = html.replace('<script src="app.js?v=4"></script>', '<script>\n' + app + '\n</script>')
+html = html.replace('<link rel="stylesheet" href="style.css?v=5">', '<style>\n' + css + '\n</style>')
+html = html.replace('<script src="pokemon-data.js?v=5"></script>', '<script>\n' + pdata + '\n</script>')
+html = html.replace('<script src="data.js?v=5"></script>', '<script>\n' + data + '\n</script>')
+html = html.replace('<script src="app.js?v=5"></script>', '<script>\n' + app + '\n</script>')
 html = html.replace('<link rel="manifest" href="manifest.json">', '')
 html = html.replace('<title>포켓몬 한글 따라쓰기</title>', '<title>포켓몬 한글 따라쓰기 · 한 파일 버전</title>')
 
