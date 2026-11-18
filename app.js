@@ -332,10 +332,11 @@
         '</button>';
     });
     html += '</div>';
-    if (allCleared()) {
+    var nextUncleared = STAGES.filter(function (x) { return !(state.cleared[x.id] > 0); })[0];
+    if (allCleared() || !nextUncleared) {
       html += '<div class="map-done">🎉 모든 단계를 깼어요! 최고예요!</div>';
     } else {
-      html += '<div class="map-next">다음은 <b>' + state.unlocked + '단계</b>예요!</div>';
+      html += '<div class="map-next">다음은 <b>' + nextUncleared.id + '단계 · ' + nextUncleared.title + '</b> 예요!</div>';
     }
     html += '<div class="map-links"><button class="ghost-btn" data-act="home">처음으로</button>' +
       '<button class="ghost-btn" data-act="parent">👨‍👩‍👧 보호자</button></div>';
@@ -557,7 +558,7 @@
       '<div class="reward-stars">' + starRow(stars) + '</div>' +
       '<div class="reward-sub">' + (showBonus
         ? (bonusId ? '모든 단계를 깼어요! 전설의 포켓몬 <b>뮤</b>가 찾아왔어요 ✨' : '모든 단계를 깼어요! 정말 대단해요 ✨')
-        : s.id + '단계 · ' + s.title + ' 를 깼어요!') + '</div>' +
+        : s.id + '단계 ' + s.title + ' 성공!') + '</div>' +
       '<div class="reward-btns">' +
       (hasNext
         ? '<button class="big-btn primary" data-act="next-stage" data-id="' + nextId + '">' + nextId + '단계 도전!</button>'

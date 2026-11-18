@@ -431,7 +431,7 @@ button {
 
 .poke-area { gap: 6px; }
 .poke-card { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.poke-img { width: 40vw; max-width: 176px; height: auto; filter: drop-shadow(0 8px 10px rgba(35, 50, 74, 0.16)); animation: floatIn .45s ease both; }
+.poke-img { width: 46vw; max-width: 202px; height: auto; filter: drop-shadow(0 8px 10px rgba(35, 50, 74, 0.16)); animation: floatIn .45s ease both; }
 .poke-name { font-size: 40px; letter-spacing: 2px; display: flex; gap: 4px; }
 .name-ch { color: var(--ink); }
 .name-blank {
