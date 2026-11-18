@@ -2634,6 +2634,11 @@ window.POKE_DATA = (function () {
 
   function speakHint() {
     if (!T) return;
+    /* 백지 단계에서는 글자를 읽어 주지 않는다 (이름만 들려주고 혼자 쓰게) */
+    if (T.guide === 'blank') {
+      Speech.speak(T.pkm.name + '!', { rate: 0.82 });
+      return;
+    }
     var target = T.chars[T.targets[T.ti]];
     Speech.speak(T.pkm.name + ', ' + target, { rate: 0.82 });
   }
@@ -2670,7 +2675,8 @@ window.POKE_DATA = (function () {
     }
     var hint = main.querySelector('.hint-canvas');
     if (!hint) return;
-    stage.hints += 1;
+    /* 한 글자에 힌트를 여러 번 눌러도 한 번으로 센다 */
+    if (!T.hintUsed) stage.hints += 1;
     T.hintUsed = 1;
     drawHint(hint.getContext('2d'), hint.width, T.char);
     hint.dataset.on = '1';
