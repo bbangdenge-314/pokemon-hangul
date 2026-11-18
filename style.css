@@ -155,7 +155,6 @@ button {
   align-items: center;
   text-align: center;
   background: linear-gradient(180deg, #7ed0ff 0%, #b9ecff 45%, #e8fbe0 72%, #a8e46a 72%, #8ed14e 100%);
-  overflow: hidden;
 }
 .home-sky { position: absolute; inset: 0; pointer-events: none; }
 .home-cloud {
@@ -330,7 +329,7 @@ button {
 .sc-title { font-size: 21px; letter-spacing: -0.4px; }
 .sc-sub { font-size: 15px; color: #7a8fa6; }
 .sc-icon { font-size: 26px; opacity: .9; }
-.sc-stars { position: absolute; right: 14px; bottom: 8px; font-size: 15px; }
+.sc-stars { font-size: 15px; letter-spacing: 1px; margin-top: 1px; line-height: 1; }
 .sc-stars .star.off { color: #dde7f0; }
 
 .star { display: inline-block; margin-left: 1px; }
@@ -432,7 +431,7 @@ button {
 
 .poke-area { gap: 6px; }
 .poke-card { display: flex; flex-direction: column; align-items: center; gap: 2px; }
-.poke-img { width: 46vw; max-width: 200px; height: auto; filter: drop-shadow(0 8px 10px rgba(35, 50, 74, 0.16)); animation: floatIn .45s ease both; }
+.poke-img { width: 40vw; max-width: 176px; height: auto; filter: drop-shadow(0 8px 10px rgba(35, 50, 74, 0.16)); animation: floatIn .45s ease both; }
 .poke-name { font-size: 40px; letter-spacing: 2px; display: flex; gap: 4px; }
 .name-ch { color: var(--ink); }
 .name-blank {
@@ -506,7 +505,6 @@ button {
   text-align: center;
   gap: 10px;
   background: radial-gradient(circle at 50% 32%, #fffbe6 0%, #fff4c2 35%, #d8f3ff 100%);
-  overflow: hidden;
 }
 
 .reward-stage {

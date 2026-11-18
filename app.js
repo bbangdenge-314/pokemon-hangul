@@ -135,21 +135,41 @@
     init: function () {
       if (!('speechSynthesis' in window)) return;
       this.pick();
+      var self = this;
       try {
-        window.speechSynthesis.onvoiceschanged = function () { Speech.pick(); };
+        window.speechSynthesis.onvoiceschanged = function () { self.pick(); };
       } catch (e) {}
+    },
+    /* 소리를 들려줄 수 없는 상황이면 글자 힌트를 보여준다 */
+    usable: function () {
+      if (!('speechSynthesis' in window)) return false;
+      var list = [];
+      try { list = window.speechSynthesis.getVoices() || []; } catch (e) {}
+      if (list.length === 0) return true; // 아직 음성 목록을 못 읽었을 뿐
+      return !!this.voice;
     },
     speak: function (text, opts) {
       if (state.muted || !text || !('speechSynthesis' in window)) return;
+      var self = this;
+      var go = function () {
+        try {
+          var u = new SpeechSynthesisUtterance(String(text));
+          u.lang = 'ko-KR';
+          if (self.voice) u.voice = self.voice;
+          u.rate = (opts && opts.rate) || 0.9;
+          u.pitch = 1.15;
+          u.volume = 1;
+          window.speechSynthesis.speak(u);
+        } catch (e) {}
+      };
       try {
-        window.speechSynthesis.cancel();
-        var u = new SpeechSynthesisUtterance(String(text));
-        u.lang = 'ko-KR';
-        if (this.voice) u.voice = this.voice;
-        u.rate = (opts && opts.rate) || 0.9;
-        u.pitch = 1.15;
-        u.volume = 1;
-        window.speechSynthesis.speak(u);
+        // 말하는 중이면 끊고 조금 뒤에 읽는다 (바로 읽으면 소리가 나지 않는 경우가 있어서)
+        if (window.speechSynthesis.speaking || window.speechSynthesis.pending) {
+          window.speechSynthesis.cancel();
+          setTimeout(go, 90);
+        } else {
+          go();
+        }
       } catch (e) {}
     },
     stop: function () {
@@ -306,9 +326,9 @@
         '<span class="sc-body">' +
         '<span class="sc-title">' + (locked ? '아직 잠겨 있어요' : s.id + '단계 · ' + s.title) + '</span>' +
         '<span class="sc-sub">' + (locked ? s.id + '단계를 먼저 깨야 해요' : s.subtitle) + '</span>' +
+        '<span class="sc-stars">' + starRow(stars) + '</span>' +
         '</span>' +
         '<span class="sc-icon">' + (locked ? '🚪' : s.icon) + '</span>' +
-        (cleared ? '<span class="sc-stars">' + starRow(stars) + '</span>' : '<span class="sc-stars">' + starRow(0) + '</span>') +
         '</button>';
     });
     html += '</div>';
@@ -353,17 +373,23 @@
     document.getElementById('hud').style.setProperty('--theme', s.theme);
 
     var prompt = '';
+    var voiceOk = Speech.usable();
+    function helpText(defaultText) {
+      if (!voiceOk) return '소리: <b>' + q.say + '</b> · 이 기기에서 소리가 나오지 않아요';
+      if (state.muted) return '소리가 꺼져 있어요! 🔊 를 눌러 주세요';
+      return defaultText;
+    }
     if (q.type === 'listen') {
       prompt = '<div class="prompt-area">' +
         '<div class="prompt-chip">무슨 소리일까요?</div>' +
         '<button class="speaker-btn" data-act="replay" aria-label="다시 듣기">🔊</button>' +
-        '<div class="prompt-help">' + (state.muted ? '소리가 꺼져 있어요! 🔊 를 눌러 주세요' : '잘 듣고 같은 글자를 골라요') + '</div>' +
+        '<div class="prompt-help">' + helpText('잘 듣고 같은 글자를 골라요') + '</div>' +
         '</div>';
     } else if (q.type === 'consonant') {
       prompt = '<div class="prompt-area">' +
         '<div class="prompt-chip">첫소리를 찾아보세요</div>' +
         '<button class="speaker-btn" data-act="replay" aria-label="다시 듣기">🔊</button>' +
-        '<div class="prompt-help">' + (state.muted ? '소리가 꺼져 있어요! 🔊 를 눌러 주세요' : '이름을 잘 듣고 글자를 골라요') + '</div>' +
+        '<div class="prompt-help">' + helpText('이름을 잘 듣고 글자를 골라요') + '</div>' +
         '</div>';
     } else if (q.type === 'combine') {
       prompt = '<div class="prompt-area">' +
