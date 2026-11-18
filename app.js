@@ -780,12 +780,6 @@
     ctx.moveTo(a.x * w, a.y * w);
     ctx.lineTo(b.x * w, b.y * w);
     ctx.stroke();
-    ctx.strokeStyle = 'rgba(255,255,255,0.30)';
-    ctx.lineWidth = w * 0.03;
-    ctx.beginPath();
-    ctx.moveTo(a.x * w, a.y * w);
-    ctx.lineTo(b.x * w, b.y * w);
-    ctx.stroke();
   }
 
   function drawDot(p) {
@@ -797,10 +791,6 @@
     ctx.fillStyle = col;
     ctx.beginPath();
     ctx.arc(p.x * w, p.y * w, w * 0.0425, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = 'rgba(255,255,255,0.30)';
-    ctx.beginPath();
-    ctx.arc(p.x * w, p.y * w, w * 0.014, 0, Math.PI * 2);
     ctx.fill();
   }
 
