@@ -499,6 +499,10 @@ def main():
         page.evaluate("() => { const b = document.querySelector('[data-act=\"close-detail\"]'); if (b) b.click(); }")
         page.wait_for_timeout(300)
 
+        page.evaluate("() => { document.querySelector('[data-act=\"back\"]').click(); }")
+        page.wait_for_timeout(600)
+        check("도감에서 뒤로 가면 모험 지도로", page.evaluate("() => !!document.querySelector('.stage-card')"))
+
         # ---------- 13. 단계 완료 → 보상 ----------
         page.evaluate("() => { window.__trace.clearStorage(); }")
         page.goto(base_url + "?fresh=1#debug", wait_until="load")

@@ -393,6 +393,7 @@
   var T = null;       /* 따라쓰기 세션 */
   var tokenSeq = 0;
   var dexState = { gen: 0, q: '', shown: 0, list: [] };
+  var dexFrom = 'map';   /* 도감을 어디서 열었는지 (뒤로 가면 그리로) */
 
   function setHud(title) {
     if (!title) { hud.hidden = true; hud.innerHTML = ''; return; }
@@ -1778,6 +1779,7 @@
         break;
       case 'back':
         if (view === 'quiz') goMap();
+        else if (view === 'dex') { if (dexFrom === 'home') goHome(); else goMap(); }
         else goHome();
         break;
       case 'pick-gen': {
@@ -1822,6 +1824,7 @@
         useHint();
         break;
       case 'dex':
+        if (view !== 'dex') dexFrom = view;
         goDex();
         break;
       case 'dex-gen': {

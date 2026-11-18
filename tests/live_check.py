@@ -161,8 +161,8 @@ def main():
         check("공개 주소: 이름으로 찾기", found == [25], found)
 
         # ---------- 6. 세대 고르기 ----------
-        page.evaluate("() => { document.querySelector('[data-act=\"back\"]').click(); }")
-        page.wait_for_timeout(500)
+        page.evaluate("() => { document.querySelector('[data-act=\"map\"]').click(); }")
+        page.wait_for_timeout(600)
         page.evaluate("() => { const c = document.querySelector('.gen-chip[data-gen=\"9\"]'); if (c) c.click(); }")
         page.wait_for_timeout(500)
         page.evaluate("() => window.__trace.goto(3)")
