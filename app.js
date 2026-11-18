@@ -1,7 +1,9 @@
-/* 포켓몬 한글 따라쓰기 - 메인 로직 (v3)
+/* 포켓몬 한글 따라쓰기 - 메인 로직 (v4)
+   - 전국도감 1~1025 (1~9세대) 전체
    - 글자를 다 쓰면 저절로 정답 처리 (손을 뗀 뒤 잠깐 기다렸다가 검사)
    - 정밀 인식: 글자 덮음 + 3x3 구역 검사 + 글자 밖 벗어남 검사
-   - 6단계: 진한 가이드 → 흐린 가이드 → 백지 혼자 쓰기 */
+   - 6단계: 진한 가이드 → 흐린 가이드 → 백지 혼자 쓰기
+   - 포획할 때 포켓몬 울음소리 재생 (실패하면 한국어 목소리로 대신) */
 (function () {
   'use strict';
 
@@ -11,20 +13,27 @@
   var REWARDS = D.REWARDS;
   var BONUS = D.BONUS;
   var GEN_COLORS = D.GEN_COLORS;
+  var GEN_NAMES = D.GEN_NAMES;
   var artworkUrl = D.artworkUrl;
   var spriteUrl = D.spriteUrl;
+  var cryUrl = D.cryUrl;
+  var cryAltUrl = D.cryAltUrl;
   var genOf = D.genOf;
   var genLabel = D.genLabel;
+  var typeColor = D.typeColor;
+  var makeQuestions = D.makeQuestions;
+  var stagePool = D.stagePool;
 
-  var KEY = 'pokemon-hangul-trace-v3';
+  var KEY = 'pokemon-hangul-v4';
+  var OLD_KEYS = ['pokemon-hangul-trace-v3'];
   var main = document.getElementById('main');
   var hud = document.getElementById('hud');
   var confettiLayer = document.getElementById('confetti-layer');
   var toastEl = document.getElementById('toast');
 
-  var POKE_IDS = Object.keys(POKEMON).map(Number).sort(function (a, b) { return a - b; });
+  var POKE_IDS = D.POKE_IDS;
   var PRAISE = ['좋았어!', '잘했어!', '최고야!', '멋져!', '딱 좋아!', '짝짝짝!'];
-  var INK_COLORS = ['#ff6b9d', '#4dabf7', '#845ef7', '#f76707', '#20c997', '#e64980'];
+  var INK_COLORS = ['#ff7ba9', '#4db8ff', '#a98bff', '#ffa94d', '#37c9a3', '#ff6b6b'];
 
   /* 정밀 인식 기준 (단계별) */
   var RECOG = {
@@ -40,22 +49,32 @@
 
   /* ---------------- 상태 저장 ---------------- */
   function defaultState() {
-    return { unlocked: 1, cleared: {}, caught: [], muted: false };
+    return { unlocked: 1, cleared: {}, caught: [], muted: false, gen: 0 };
   }
   var state = defaultState();
 
+  function validId(id) { return !!POKEMON[Number(id)]; }
+
   function loadState() {
+    var raw = null;
+    try { raw = localStorage.getItem(KEY); } catch (e) {}
+    if (!raw) {
+      /* v3 기록이 있으면 잡은 포켓몬·별·잠금 해제를 이어받는다 */
+      for (var i = 0; i < OLD_KEYS.length && !raw; i++) {
+        try { raw = localStorage.getItem(OLD_KEYS[i]); } catch (e) { raw = null; }
+      }
+    }
+    if (!raw) return;
     try {
-      var raw = localStorage.getItem(KEY);
-      if (!raw) return;
       var s = JSON.parse(raw);
       if (!s || typeof s !== 'object') return;
       state = Object.assign(defaultState(), s);
       if (!Array.isArray(state.caught)) state.caught = [];
-      /* 예전 판에서 잡은 포켓몬 중 지금 도감에 없는 번호는 정리한다 */
-      state.caught = state.caught.map(Number).filter(function (id) { return !!POKEMON[id]; });
+      state.caught = state.caught.map(Number).filter(validId);
       if (!state.cleared || typeof state.cleared !== 'object') state.cleared = {};
       state.unlocked = Math.min(STAGES.length, Math.max(1, Number(state.unlocked) || 1));
+      state.gen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].indexOf(Number(state.gen)) !== -1 ? Number(state.gen) : 0;
+      state.muted = !!state.muted;
     } catch (e) {
       state = defaultState();
     }
@@ -66,13 +85,18 @@
   function isCaught(id) { return state.caught.indexOf(Number(id)) !== -1; }
   function catchPokemon(id) {
     id = Number(id);
-    if (isCaught(id)) return false;
+    if (!validId(id) || isCaught(id)) return false;
     state.caught.push(id);
     saveState();
     return true;
   }
   function clearedCount() { return Object.keys(state.cleared).length; }
-  function caughtCount() { return POKE_IDS.filter(isCaught).length; }
+  function caughtCount() { return state.caught.length; }
+  function caughtOf(ids) {
+    var n = 0;
+    ids.forEach(function (id) { if (isCaught(id)) n++; });
+    return n;
+  }
   function totalStars() {
     var t = 0;
     Object.keys(state.cleared).forEach(function (k) { t += Number(state.cleared[k]) || 0; });
@@ -82,7 +106,7 @@
     return STAGES.every(function (s) { return state.cleared[s.id] > 0; });
   }
 
-  /* ---------------- 소리 ---------------- */
+  /* ---------------- 효과음 ---------------- */
   var Sound = {
     ctx: null,
     ensure: function () {
@@ -127,24 +151,24 @@
       osc.connect(gain); gain.connect(ctx.destination);
       osc.start(t0); osc.stop(t0 + dur + 0.05);
     },
-    tap: function () { this.tone(880, 0, 0.07, 'sine', 0.06); },
+    tap: function () { this.tone(980, 0, 0.06, 'sine', 0.05); },
     correct: function () {
-      var notes = [523.25, 659.25, 783.99, 1046.5];
-      for (var i = 0; i < notes.length; i++) this.tone(notes[i], i * 0.07, 0.2, 'sine', 0.15);
+      var notes = [659.25, 783.99, 987.77, 1318.5];
+      for (var i = 0; i < notes.length; i++) this.tone(notes[i], i * 0.07, 0.18, 'sine', 0.13);
     },
-    pop: function () { this.slide(500, 1200, 0, 0.14, 0.13); },
-    nudge: function () { this.slide(420, 560, 0, 0.2, 0.1); },
+    pop: function () { this.slide(520, 1300, 0, 0.13, 0.12); },
+    nudge: function () { this.slide(420, 560, 0, 0.2, 0.09); },
     fanfare: function () {
       var seq = [[523.25, 0], [659.25, 0.12], [783.99, 0.24], [1046.5, 0.36], [783.99, 0.52], [1046.5, 0.62], [1318.5, 0.74]];
-      for (var i = 0; i < seq.length; i++) this.tone(seq[i][0], seq[i][1], 0.3, 'triangle', 0.13);
-      this.tone(261.63, 0, 0.9, 'sine', 0.07);
-      this.tone(392.0, 0, 0.9, 'sine', 0.05);
+      for (var i = 0; i < seq.length; i++) this.tone(seq[i][0], seq[i][1], 0.28, 'triangle', 0.11);
+      this.tone(261.63, 0, 0.9, 'sine', 0.06);
     }
   };
 
   /* ---------------- 말하기(TTS) ---------------- */
   var Speech = {
     voice: null,
+    last: null,
     init: function () {
       if (!('speechSynthesis' in window)) return;
       var self = this;
@@ -165,6 +189,7 @@
     },
     speak: function (text, opts) {
       if (state.muted || !text || !('speechSynthesis' in window)) return;
+      this.last = String(text);
       var self = this;
       var go = function () {
         try {
@@ -172,7 +197,7 @@
           u.lang = 'ko-KR';
           if (self.voice) u.voice = self.voice;
           u.rate = (opts && opts.rate) || 0.88;
-          u.pitch = 1.15;
+          u.pitch = 1.18;
           u.volume = 1;
           window.speechSynthesis.speak(u);
         } catch (e) {}
@@ -191,8 +216,82 @@
     }
   };
 
+  /* ---------------- 포켓몬 울음소리 ---------------- */
+  var Cry = {
+    els: {},
+    order: [],
+    last: null,
+    forceFail: false,
+    make: function (url) {
+      var a = new Audio();
+      a.preload = 'auto';
+      a.volume = 0.9;
+      a.src = url;
+      return a;
+    },
+    get: function (id) {
+      id = Number(id);
+      var e = this.els[id];
+      if (!e) {
+        e = { main: this.make(cryUrl(id)), alt: null };
+        this.els[id] = e;
+        this.order.push(id);
+        while (this.order.length > 6) {
+          var old = this.order.shift();
+          if (old === id) continue;
+          try { this.els[old].main.src = ''; } catch (err) {}
+          delete this.els[old];
+        }
+      }
+      return e;
+    },
+    /* 다음에 들을 울음소리를 미리 받아 둔다 */
+    preload: function (id) {
+      if (state.muted || !validId(id)) return;
+      try { this.get(id).main.load(); } catch (err) {}
+    },
+    tryPlay: function (el, done) {
+      var settled = false;
+      var finish = function (ok) {
+        if (settled) return;
+        settled = true;
+        el.onerror = null;
+        done(ok);
+      };
+      el.onerror = function () { finish(false); };
+      try {
+        el.currentTime = 0;
+        var p = el.play();
+        if (p && p.then) {
+          p.then(function () { finish(true); }, function () { finish(false); });
+        }
+        setTimeout(function () { if (!settled && !el.paused) finish(true); }, 700);
+      } catch (err) { finish(false); }
+    },
+    /* cb('ok' | 'fail' | 'muted') */
+    play: function (id, cb) {
+      var self = this;
+      id = Number(id);
+      self.last = { id: id, url: cryUrl(id), status: 'start' };
+      var done = function (status) {
+        self.last.status = status;
+        if (cb) cb(status);
+      };
+      if (!validId(id)) { done('fail'); return; }
+      if (state.muted) { done('muted'); return; }
+      if (self.forceFail) { done('fail'); return; }
+      var e = self.get(id);
+      self.tryPlay(e.main, function (ok) {
+        if (ok) { done('ok'); return; }
+        /* 다른 주소에서 한 번 더 (네트워크·형식 문제 대비) */
+        if (!e.alt) e.alt = self.make(cryAltUrl(id));
+        self.tryPlay(e.alt, function (ok2) { done(ok2 ? 'ok' : 'fail'); });
+      });
+    }
+  };
+
   /* ---------------- 효과 ---------------- */
-  var COLORS = ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#b983ff', '#ff9f43', '#ff8fab'];
+  var COLORS = ['#ff8fb1', '#ffd166', '#7ee0a8', '#7cc7ff', '#c2a4ff', '#ffb27f', '#ff9ec4'];
 
   function confetti(n, origin) {
     n = n || 26;
@@ -205,13 +304,14 @@
       p.style.left = x + 'px';
       p.style.top = y + 'px';
       p.style.background = COLORS[i % COLORS.length];
-      p.style.setProperty('--dx', (Math.random() * 2 - 1) * (w * 0.32) + 'px');
+      p.style.setProperty('--dx', (Math.random() * 2 - 1) * (w * 0.34) + 'px');
       p.style.setProperty('--dy', (Math.random() * 0.5 + 0.9) * (h * 0.45) + 'px');
       p.style.setProperty('--rot', Math.round(Math.random() * 900 - 450) + 'deg');
       p.style.setProperty('--dur', (1.1 + Math.random() * 0.9).toFixed(2) + 's');
       p.style.animationDelay = (Math.random() * 0.15).toFixed(2) + 's';
+      if (i % 3 === 0) p.style.borderRadius = '50%';
       confettiLayer.appendChild(p);
-      (function (node) { setTimeout(function () { node.remove(); }, 2600); })(p);
+      (function (node) { setTimeout(function () { node.remove(); }, 2800); })(p);
     }
   }
 
@@ -235,17 +335,18 @@
 
   var PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">' +
-    '<circle cx="60" cy="60" r="52" fill="#f5f7fb" stroke="#c9d6e8" stroke-width="6"/>' +
-    '<path d="M8 60a52 52 0 0 1 104 0z" fill="#ff7b7b"/>' +
-    '<rect x="8" y="55" width="104" height="10" fill="#39445c"/>' +
-    '<circle cx="60" cy="60" r="16" fill="#fff" stroke="#39445c" stroke-width="8"/>' +
+    '<circle cx="60" cy="60" r="52" fill="#fff4f8" stroke="#ffd0e2" stroke-width="6"/>' +
+    '<path d="M8 60a52 52 0 0 1 104 0z" fill="#ff9ec4"/>' +
+    '<rect x="8" y="55" width="104" height="10" fill="#6b5a72"/>' +
+    '<circle cx="60" cy="60" r="16" fill="#fff" stroke="#6b5a72" stroke-width="8"/>' +
     '</svg>'
   );
 
   window.__pokeImgFallback = function (img) {
     var step = Number(img.getAttribute('data-step') || 0);
     var id = img.getAttribute('data-id');
-    if (step === 0) {
+    var spriteOnly = img.getAttribute('data-sprite') === '1';
+    if (step === 0 && !spriteOnly) {
       img.setAttribute('data-step', '1');
       img.src = spriteUrl(id);
     } else {
@@ -255,15 +356,18 @@
     }
   };
 
-  function pokeImg(id, cls, alt) {
-    return '<img class="' + (cls || '') + '" data-id="' + id + '" data-step="0" ' +
-      'src="' + artworkUrl(id) + '" alt="' + (alt || POKEMON[id].name) + '" ' +
-      'loading="lazy" decoding="async" onerror="window.__pokeImgFallback(this)">';
+  function pokeImg(id, cls, opts) {
+    opts = opts || {};
+    var sprite = !!opts.sprite;
+    var alt = opts.alt || (POKEMON[id] ? POKEMON[id].name : '포켓몬');
+    return '<img class="' + (cls || '') + '" data-id="' + id + '" data-step="0" data-sprite="' + (sprite ? '1' : '0') + '" ' +
+      'src="' + (sprite ? spriteUrl(id) : artworkUrl(id)) + '" alt="' + alt + '" ' +
+      'loading="lazy" decoding="async" draggable="false" onerror="window.__pokeImgFallback(this)">';
   }
 
   function genBadge(id, extraCls) {
     return '<span class="gen-badge' + (extraCls ? ' ' + extraCls : '') + '" style="--gen:' +
-      (GEN_COLORS[genOf(id)] || '#495057') + '">' + genLabel(id) + '</span>';
+      (GEN_COLORS[genOf(id)] || '#9b8bff') + '">' + genLabel(id) + '</span>';
   }
 
   function starRow(n, max) {
@@ -285,10 +389,10 @@
 
   /* ---------------- 화면 공통 ---------------- */
   var view = 'home';
-  var stage = null;   /* { data, index, hints, clears } */
+  var stage = null;   /* { data, questions, index, hints, clears } */
   var T = null;       /* 따라쓰기 세션 */
   var tokenSeq = 0;
-  var dexFilter = 0;
+  var dexState = { gen: 0, q: '', shown: 0, list: [] };
 
   function setHud(title) {
     if (!title) { hud.hidden = true; hud.innerHTML = ''; return; }
@@ -311,39 +415,56 @@
     cancelTimers();
     T = null;
     Speech.stop();
+    try { Object.keys(Cry.els).forEach(function (k) { Cry.els[k].main.pause(); }); } catch (e) {}
     var ov = document.getElementById('catch-overlay');
     if (ov) ov.remove();
+    var md = document.getElementById('dex-detail');
+    if (md) md.remove();
   }
 
   /* ---------------- 홈 ---------------- */
+  var HEROES = [[25, 133, 1008], [1, 4, 7], [906, 909, 912], [39, 183, 700], [151, 251, 385], [448, 658, 778], [175, 187, 209], [152, 255, 258]];
+
   function goHome() {
     hideToast();
     view = 'home';
     stage = null;
     endTrace();
     setHud(null);
+    var trio = HEROES[Math.floor(Math.random() * HEROES.length)];
     var started = clearedCount() > 0 || state.unlocked > 1;
     main.innerHTML =
       '<section class="screen home-screen">' +
-      '<div class="home-sky"></div>' +
+      '<div class="home-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>' +
       '<div class="home-cloud c1"></div><div class="home-cloud c2"></div><div class="home-cloud c3"></div>' +
       '<div class="home-inner">' +
-      '<div class="home-badge">1~9세대 · ' + POKE_IDS.length + '마리 · 5살</div>' +
-      '<h1 class="home-title">포켓몬<br>한글 따라쓰기</h1>' +
+      '<div class="home-badge">전국도감 <b>' + D.COUNT + '</b>마리 · 1~9세대</div>' +
+      '<h1 class="home-title"><span>포켓몬</span><span>한글</span><span>따라쓰기</span></h1>' +
       '<div class="home-hero">' +
-      '<div class="hero-poke mini">' + pokeImg(906, 'hero-img') + '</div>' +
-      '<div class="hero-poke big">' + pokeImg(25, 'hero-img') + '</div>' +
-      '<div class="hero-poke mini">' + pokeImg(1008, 'hero-img') + '</div>' +
+      '<div class="hero-poke mini">' + pokeImg(trio[0], 'hero-img') + '</div>' +
+      '<div class="hero-poke big">' + pokeImg(trio[1], 'hero-img') + '</div>' +
+      '<div class="hero-poke mini">' + pokeImg(trio[2], 'hero-img') + '</div>' +
+      '<div class="hero-ball" aria-hidden="true"><i></i><b></b></div>' +
       '</div>' +
       '<p class="home-sub">포켓몬 이름을 손가락으로 써 봐요!</p>' +
       '<button class="big-btn primary" data-act="start">' + (started ? '계속 하기' : '시작하기') + '</button>' +
       '<div class="home-links">' +
-      '<button class="ghost-btn" data-act="dex">📕 나의 도감 (' + caughtCount() + ')</button>' +
+      '<button class="ghost-btn" data-act="dex">📕 도감 <b>' + caughtCount() + '</b></button>' +
       '<button class="ghost-btn" data-act="parent">👨‍👩‍👧 보호자</button>' +
       '</div>' +
       '</div>' +
-      '<div class="home-grass"></div>' +
       '</section>';
+  }
+
+  /* ---------------- 세대 고르기 ---------------- */
+  function genPickerHTML() {
+    var html = '<div class="gen-picker" role="group" aria-label="세대 고르기">' +
+      '<button class="gen-chip' + (!state.gen ? ' on' : '') + '" data-act="pick-gen" data-gen="0">전체 ' + D.COUNT + '</button>';
+    for (var g = 1; g <= 9; g++) {
+      html += '<button class="gen-chip' + (state.gen === g ? ' on' : '') + '" data-act="pick-gen" data-gen="' + g + '" ' +
+        'style="--gen:' + (GEN_COLORS[g] || '#9b8bff') + '">' + g + '세대<em>' + GEN_NAMES[g] + '</em></button>';
+    }
+    return html + '</div>';
   }
 
   /* ---------------- 지도 ---------------- */
@@ -354,25 +475,29 @@
     endTrace();
     setHud('모험 지도');
     var done = clearedCount();
+    var genIds = state.gen ? POKE_IDS.filter(function (id) { return genOf(id) === state.gen; }) : POKE_IDS;
     var html = '<section class="screen map-screen">';
     html += '<div class="map-top">' +
       '<div class="map-progress"><span>진행한 단계 <b>' + done + '</b> / ' + STAGES.length + '</span>' +
       '<div class="map-bar"><i style="width:' + (done / STAGES.length * 100) + '%"></i></div></div>' +
-      '<button class="dex-btn" data-act="dex">📕 도감</button>' +
+      '<button class="dex-btn" data-act="dex">📕 도감<br><b>' + caughtCount() + '</b></button>' +
       '</div>';
+    html += '<div class="gen-pick"><div class="gen-pick-title">어느 세대 포켓몬과 놀까요?</div>' + genPickerHTML() + '</div>';
     html += '<div class="stage-list">';
     STAGES.forEach(function (s) {
       var locked = s.id > state.unlocked;
       var stars = state.cleared[s.id] || 0;
       var cleared = stars > 0;
+      var pool = stagePool(s.id, state.gen).length;
       html += '<button class="stage-card' + (locked ? ' locked' : '') + (cleared ? ' cleared' : '') +
         '" data-act="stage" data-id="' + s.id + '" data-locked="' + (locked ? '1' : '0') + '" ' +
-        'style="--theme:' + s.theme + '">' +
+        'style="--theme:' + s.theme + ';--theme2:' + s.theme2 + '">' +
         '<span class="sc-num">' + (locked ? '🔒' : (cleared ? '✓' : s.id)) + '</span>' +
         '<span class="sc-body">' +
         '<span class="sc-title">' + (locked ? '아직 잠겨 있어요' : s.id + '단계 · ' + s.title) + '</span>' +
         '<span class="sc-sub">' + (locked ? s.id + '단계를 먼저 깨야 해요' : s.subtitle) + '</span>' +
-        '<span class="sc-stars">' + starRow(stars) + '</span>' +
+        '<span class="sc-meta"><span class="sc-stars">' + starRow(stars) + '</span>' +
+        (locked ? '' : '<span class="sc-pool">' + pool + '마리 중 ' + s.count + '마리</span>') + '</span>' +
         '</span>' +
         '<span class="sc-icon">' + (locked ? '🚪' : s.icon) + '</span>' +
         '</button>';
@@ -386,8 +511,10 @@
     }
     html += '<div class="map-links"><button class="ghost-btn" data-act="home">처음으로</button>' +
       '<button class="ghost-btn" data-act="parent">👨‍👩‍👧 보호자</button></div>';
+    html += '<div class="map-dex-note">도감 <b>' + caughtCount() + '</b> / ' + D.COUNT + '마리 · 잡은 포켓몬은 도감에 쌓여요</div>';
     html += '</section>';
     main.innerHTML = html;
+    main.scrollTop = 0;
   }
 
   /* ---------------- 단계 시작 ---------------- */
@@ -400,8 +527,19 @@
       toast('아직 잠겨 있어요! 앞 단계를 먼저 깨요 🔒');
       return;
     }
+    var pool = stagePool(id, state.gen);
+    if (!pool.length) {
+      toast('이 세대에는 이 단계 포켓몬이 없어요. 세대를 바꿔 볼까요?');
+      return;
+    }
     hideToast();
-    stage = { data: s, index: 0, hints: 0, clears: 0 };
+    stage = {
+      data: s,
+      questions: makeQuestions(id, state.gen, s.count, isCaught),
+      index: 0,
+      hints: 0,
+      clears: 0
+    };
     view = 'quiz';
     renderQuestion();
   }
@@ -416,7 +554,7 @@
   }
 
   function nameRowClass(n) {
-    return n >= 5 ? ' len5' : (n === 4 ? ' len4' : (n === 3 ? ' len3' : ''));
+    return n >= 6 ? ' len6' : (n === 5 ? ' len5' : (n === 4 ? ' len4' : (n === 3 ? ' len3' : (n === 2 ? ' len2' : ''))));
   }
 
   function nameRowHTML(chars, targets, doneCount) {
@@ -441,26 +579,30 @@
   function renderQuestion() {
     hideToast();
     var s = stage.data;
-    var q = s.questions[stage.index];
+    var q = stage.questions[stage.index];
+    if (!q) { finishStage(); return; }
     var pkm = POKEMON[q.id];
     var chars = pkm.name.split('');
     var targets = traceTargets(q);
-    var total = s.questions.length;
+    var total = stage.questions.length;
     var blank = s.guide === 'blank';
 
     setHud(s.title);
-    document.getElementById('hud').style.setProperty('--theme', s.theme);
+    hud.style.setProperty('--theme', s.theme);
 
     main.innerHTML =
-      '<section class="screen trace-screen" style="--theme:' + s.theme + '">' +
+      '<section class="screen trace-screen" style="--theme:' + s.theme + ';--theme2:' + s.theme2 + '">' +
       '<div class="q-top">' +
-      '<div class="q-step">' + s.icon + ' ' + s.id + '단계</div>' +
-      '<div class="q-count">' + (stage.index + 1) + ' / ' + total + '</div>' +
-      '</div>' +
+      '<span class="q-step">' + s.icon + ' ' + s.id + '단계</span>' +
       '<div class="q-bar"><i style="width:' + (stage.index / total * 100) + '%"></i></div>' +
-      '<div class="poke-strip">' +
-      '<div class="strip-img">' + pokeImg(q.id, 'strip-poke') + '</div>' +
-      '<div class="strip-body">' +
+      '<span class="q-count"><b>' + (stage.index + 1) + '</b>/' + total + '</span>' +
+      '</div>' +
+      '<div class="poke-card">' +
+      '<button class="poke-art" data-act="cry" data-id="' + q.id + '" aria-label="' + pkm.name + ' 울음소리">' +
+      pokeImg(q.id, 'strip-poke') +
+      '<span class="art-badge">' + genLabel(q.id) + '</span>' +
+      '</button>' +
+      '<div class="poke-body">' +
       '<div class="name-row' + nameRowClass(chars.length) + '" id="name-row">' + nameRowHTML(chars, targets, 0) + '</div>' +
       '<div class="strip-hint" id="trace-hint">' + s.tip + '</div>' +
       '</div>' +
@@ -478,7 +620,6 @@
       '<canvas class="ink-canvas" role="img" aria-label="따라 쓰기 칸"></canvas>' +
       '<div class="start-dot" id="start-dot" hidden></div>' +
       '<div class="zone-mark" id="zone-mark" aria-hidden="true"></div>' +
-      '<div class="box-glow" aria-hidden="true"></div>' +
       '</div>' +
       '<div class="cover-wrap"><div class="cover-bar" id="cover-bar"></div></div>' +
       '<div class="cover-label" id="cover-label">손가락으로 회색 글자를 따라 그어요</div>' +
@@ -521,12 +662,15 @@
 
     initSyllable();
     speakQuestion();
+    /* 다음 문제의 울음소리를 미리 받아 둔다 */
+    var nextQ = stage.questions[stage.index + 1];
+    if (nextQ) Cry.preload(nextQ.id);
   }
 
   function boxSize() {
     /* 화면 위/아래에 늘 있는 것들의 높이를 빼고 남는 만큼만 칸으로 쓴다 */
     var chrome = 0;
-    ['#hud', '.q-top', '.q-bar', '.poke-strip', '.trace-btns'].forEach(function (sel) {
+    ['#hud', '.q-top', '.poke-card', '.cover-wrap', '.cover-label', '.trace-btns'].forEach(function (sel) {
       var el = document.querySelector(sel);
       if (el && el.offsetHeight) chrome += el.offsetHeight;
     });
@@ -534,7 +678,7 @@
     var toolsH = tools && tools.offsetHeight ? tools.offsetHeight + 6 : 0;
     var byW = Math.min(window.innerWidth, 560) - 40;
     /* 간격·여백 + 덮은 정도 막대 + 안내 글자 */
-    var byH = window.innerHeight - chrome - 62 - toolsH - 74;
+    var byH = window.innerHeight - chrome - 62 - toolsH - 60;
     return Math.max(150, Math.round(Math.min(byW, byH, 400)));
   }
 
@@ -653,7 +797,7 @@
     if (mode === 'blank') return;
 
     /* 아주 옅은 십자 안내선 */
-    ctx.strokeStyle = 'rgba(150, 186, 214, 0.30)';
+    ctx.strokeStyle = 'rgba(255, 176, 208, 0.35)';
     ctx.lineWidth = Math.max(1, size * 0.005);
     ctx.setLineDash([size * 0.02, size * 0.032]);
     ctx.beginPath();
@@ -666,10 +810,10 @@
 
     var met = glyphMetrics(ctx, size, ch);
     if (mode === 'faint') {
-      ctx.fillStyle = 'rgba(186, 212, 232, 0.26)';
+      ctx.fillStyle = 'rgba(255, 200, 222, 0.30)';
       ctx.fillText(ch, size / 2, met.y);
       ctx.lineWidth = Math.max(1.5, size * 0.008);
-      ctx.strokeStyle = 'rgba(140, 180, 214, 0.40)';
+      ctx.strokeStyle = 'rgba(238, 160, 194, 0.45)';
       ctx.setLineDash([size * 0.014, size * 0.030]);
       ctx.strokeText(ch, size / 2, met.y);
       ctx.setLineDash([]);
@@ -677,10 +821,10 @@
     }
 
     /* strong: 진한 회색 글자 */
-    ctx.fillStyle = 'rgba(178, 204, 228, 0.62)';
+    ctx.fillStyle = 'rgba(214, 206, 224, 0.66)';
     ctx.fillText(ch, size / 2, met.y);
     ctx.lineWidth = Math.max(2, size * 0.012);
-    ctx.strokeStyle = 'rgba(108, 155, 196, 0.90)';
+    ctx.strokeStyle = 'rgba(150, 138, 170, 0.92)';
     ctx.setLineDash([size * 0.030, size * 0.026]);
     ctx.strokeText(ch, size / 2, met.y);
     ctx.setLineDash([]);
@@ -691,10 +835,10 @@
     ctx.clearRect(0, 0, size, size);
     if (!ch) return;
     var met = glyphMetrics(ctx, size, ch);
-    ctx.fillStyle = 'rgba(255, 176, 32, 0.30)';
+    ctx.fillStyle = 'rgba(255, 196, 71, 0.32)';
     ctx.fillText(ch, size / 2, met.y);
     ctx.lineWidth = Math.max(2, size * 0.010);
-    ctx.strokeStyle = 'rgba(226, 140, 0, 0.75)';
+    ctx.strokeStyle = 'rgba(240, 160, 10, 0.78)';
     ctx.setLineDash([size * 0.022, size * 0.022]);
     ctx.strokeText(ch, size / 2, met.y);
     ctx.setLineDash([]);
@@ -720,7 +864,7 @@
     if (hint && hint.dataset.on === '1') drawHint(hint.getContext('2d'), size, T.char);
     T.mask = buildMask(T.char);
     T.path = buildPath(T.mask);
-    placeStartDot(document.getElementById('box-wrap'), T.cssSize);
+    placeStartDot(T.cssSize);
     if (T.strokes && T.strokes.length) refreshBar();
   }
 
@@ -732,7 +876,6 @@
     try {
       document.fonts.load('40px Jua').then(function () {
         redrawGuideNow();
-        /* 글꼴이 늦게 준비되면 마스크가 바뀌므로 검사 기준도 다시 잡는다 */
       }, function () {});
     } catch (e) {}
   }
@@ -822,7 +965,6 @@
   function setCoverLabel(cov) {
     var el = document.getElementById('cover-label');
     if (!el || !T) return;
-    var cfg = RECOG[T.stageId] || RECOG[1];
     el.classList.remove('warn');
     if (T.progress >= 0.99) el.textContent = '거의 다 됐어요!';
     else if (cov > 0.02) el.textContent = '조금만 더 써 볼까요?';
@@ -1000,8 +1142,7 @@
     정밀 채점: 세 가지를 함께 본다.
     1) 글자 덮음(coverage) — 가이드 글자 잉크를 잉크가 충분히 덮었는가 (좁은 허용 폭)
     2) 구역 검사(zone) — 글자 상자를 3x3으로 나눠, 잉크가 있는 구역은 모두 채웠는가
-       (받침·모음을 통째로 빠뜨리면 여기서 걸린다)
-    3) 글자 밖 벗어남(off) — 잉크가 글자 허용 범위 밖에 얼마나 많은가 (마구 낙서 걸러내기)
+    3) 글자 밖 벗어남(off) — 잉크가 글자 허용 범위 밖에 얼마나 많은가
   */
   function analyze() {
     if (!T || !T.mask) return null;
@@ -1223,7 +1364,7 @@
     var wrap = document.getElementById('box-wrap');
     if (wrap) wrap.classList.add('done');
     var r = wrap ? wrap.getBoundingClientRect() : null;
-    if (r) confetti(18, { x: r.left + r.width / 2, y: r.top + r.height * 0.42 });
+    if (r) confetti(16, { x: r.left + r.width / 2, y: r.top + r.height * 0.42 });
     Sound.correct();
     T.progress = 1;
     setCoverLabel(1);
@@ -1232,6 +1373,8 @@
     var token = T.token;
     var last = (order >= T.targets.length - 1);
     if (!last) Speech.speak(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
+
+    /* 다음 글자를 미리 그려 두면 넘어갈 때 끊기지 않는다 */
     setTimeout(function () {
       if (!T || T.token !== token) return;
       T.ti = order + 1;
@@ -1245,12 +1388,13 @@
     if (!T) return;
     var token = T.token;
     var pkm = T.pkm;
-    var isNew = catchPokemon(T.q.id);
+    var id = T.q.id;
+    var isNew = catchPokemon(id);
     var nextIndex = T.stageIndex + 1;
 
-    showCatch(T.q.id, pkm, isNew, function () {
+    showCatch(id, pkm, isNew, function () {
       if (!T || T.token !== token) return;
-      if (nextIndex >= T.total) {
+      if (nextIndex >= stage.questions.length) {
         finishStage();
       } else {
         stage.index = nextIndex;
@@ -1268,11 +1412,13 @@
     ov.id = 'catch-overlay';
     ov.innerHTML =
       '<div class="catch-card">' +
+      '<div class="catch-rays" aria-hidden="true"></div>' +
       '<div class="catch-ball"><span class="pb-top"></span><span class="pb-band"></span><span class="pb-btn"></span></div>' +
       '<div class="catch-poke">' + pokeImg(id, 'catch-img') + '</div>' +
       '<div class="catch-name">' + pkm.name + '</div>' +
-      genBadge(id) +
+      '<div class="catch-tags">' + genBadge(id) + typeChipsHTML(id, 'small') + '</div>' +
       '<div class="catch-tag">' + (isNew ? '도감에 담았어요!' : '또 만났네요!') + '</div>' +
+      '<button class="catch-again" data-act="catch-cry" data-id="' + id + '">🔊 다시 듣기</button>' +
       '</div>';
     document.body.appendChild(ov);
     requestAnimationFrame(function () { ov.classList.add('show'); });
@@ -1284,20 +1430,33 @@
       var poke = ov.querySelector('.catch-poke');
       if (poke) poke.classList.add('show');
       Sound.fanfare();
-      confetti(26);
-      Speech.speak(pkm.name + '! 잡았다!', { rate: 0.96 });
-    }, 520);
+      confetti(28);
+      /* 포켓몬 울음소리! 실패하면 한국어 목소리로 대신 */
+      Cry.play(id, function (status) {
+        if (status !== 'ok') Speech.speak(pkm.name + '! 잡았다!', { rate: 0.96 });
+      });
+    }, 560);
 
     var closed = false;
-    var finish = function () {
+    var finish = function (e) {
       if (closed) return;
+      if (e && e.target && e.target.closest && e.target.closest('[data-act="catch-cry"]')) return;
       closed = true;
       ov.classList.remove('show');
       setTimeout(function () { ov.remove(); }, 180);
       if (typeof cb === 'function') cb();
     };
     ov.addEventListener('click', finish);
-    setTimeout(finish, 2100);
+    setTimeout(finish, 2600);
+  }
+
+  function typeChipsHTML(id, extraCls) {
+    var p = POKEMON[id];
+    if (!p) return '';
+    return '<span class="type-chips' + (extraCls ? ' ' + extraCls : '') + '">' +
+      p.types.map(function (t) {
+        return '<span class="type-chip" style="--tc:' + typeColor(t) + '">' + t + '</span>';
+      }).join('') + '</span>';
   }
 
   /* ---------------- 단계 완료 ---------------- */
@@ -1334,8 +1493,8 @@
     var title = gotReward ? '야호! ' + pkm.name + objParticle(pkm.name) + ' 잡았다!' : s.id + '단계 완료!';
 
     main.innerHTML =
-      '<section class="screen reward-screen" style="--theme:' + s.theme + '">' +
-      '<div class="reward-sparks"></div>' +
+      '<section class="screen reward-screen" style="--theme:' + s.theme + ';--theme2:' + s.theme2 + '">' +
+      '<div class="reward-sparks" aria-hidden="true"></div>' +
       '<div class="reward-stage">' +
       '<div class="pokeball" id="reward-ball"><span class="pb-top"></span><span class="pb-band"></span><span class="pb-btn"></span></div>' +
       '<div class="reward-poke" id="reward-poke">' + pokeImg(rewardId, 'reward-img') + '</div>' +
@@ -1345,7 +1504,7 @@
       '<div class="reward-stars">' + starRow(stars) + '</div>' +
       '<div class="reward-sub">' + (showBonus
         ? '모든 단계를 깼어요! 전설의 포켓몬 <b>뮤</b>가 찾아왔어요 ✨'
-        : s.id + '단계 · ' + s.title + ' 성공!' + genBadge(rewardId, 'soft')) + '</div>' +
+        : s.id + '단계 · ' + s.title + ' 성공! ' + genBadge(rewardId, 'soft')) + '</div>' +
       '<div class="reward-btns">' +
       (hasNext
         ? '<button class="big-btn primary" data-act="next-stage" data-id="' + nextId + '">' + nextId + '단계 도전!</button>'
@@ -1369,54 +1528,136 @@
       if (bonus) bonus.classList.add('show');
       Sound.fanfare();
       confetti(40);
-      Speech.speak((gotReward ? pkm.name + objParticle(pkm.name) + ' 잡았다! ' : '') + '대단해! 최고야!', { rate: 0.94 });
+      Cry.play(rewardId, function (status) {
+        if (status !== 'ok') Speech.speak(pkm.name + objParticle(pkm.name) + ' 잡았다! 대단해!', { rate: 0.94 });
+      });
     }, 1000);
     setTimeout(function () { confetti(24, { x: window.innerWidth * 0.2, y: window.innerHeight * 0.35 }); }, 1500);
     setTimeout(function () { confetti(24, { x: window.innerWidth * 0.8, y: window.innerHeight * 0.35 }); }, 1900);
   }
 
   /* ---------------- 도감 ---------------- */
+  var DEX_CHUNK = 60;
+
+  function dexList() {
+    var q = dexState.q.trim().toLowerCase();
+    var qNum = /^[#]?(\d{1,4})$/.exec(q);
+    /* 찾기 중에는 세대를 넘어서 찾는다 */
+    var gen = q ? 0 : dexState.gen;
+    return POKE_IDS.filter(function (id) {
+      if (gen && genOf(id) !== gen) return false;
+      if (!q) return true;
+      var name = POKEMON[id].name.toLowerCase();
+      if (qNum) return String(id) === String(Number(qNum[1]));
+      return name.indexOf(q) !== -1;
+    });
+  }
+
   function goDex() {
+    var fromDex = (view === 'dex');
     view = 'dex';
     stage = null;
     endTrace();
     setHud('나의 포켓몬 도감');
-    var gens = [];
-    POKE_IDS.forEach(function (id) {
-      var g = genOf(id);
-      if (gens.indexOf(g) === -1) gens.push(g);
-    });
-    gens.sort(function (a, b) { return a - b; });
-    var shown = POKE_IDS.filter(function (id) { return !dexFilter || genOf(id) === dexFilter; });
-    var caughtInShown = shown.filter(isCaught).length;
-
+    if (!fromDex) dexState.gen = state.gen;
+    dexState.q = '';
     var html = '<section class="screen dex-screen">' +
       '<div class="dex-head">' +
-      '<div class="dex-count"><b>' + caughtCount() + '</b> / ' + POKE_IDS.length + ' 마리</div>' +
-      '<div class="dex-hint">1세대부터 9세대까지! 잡은 포켓몬을 누르면 이름을 들려줘요</div>' +
+      '<div class="dex-count"><b>' + caughtCount() + '</b> / ' + D.COUNT + ' 마리</div>' +
+      '<div class="dex-progress"><i style="width:' + (caughtCount() / D.COUNT * 100) + '%"></i></div>' +
+      '<div class="dex-hint">잡은 포켓몬을 누르면 이름과 울음소리를 들려줘요</div>' +
       '</div>' +
-      '<div class="dex-filter">' +
-      '<button class="gen-chip' + (!dexFilter ? ' on' : '') + '" data-act="dex-filter" data-gen="0">전체</button>' +
-      gens.map(function (g) {
-        return '<button class="gen-chip' + (dexFilter === g ? ' on' : '') + '" data-act="dex-filter" data-gen="' + g + '" style="--gen:' + (GEN_COLORS[g] || '#495057') + '">' + g + '세대</button>';
+      '<div class="gen-picker dex-gens" role="group" aria-label="세대 고르기">' +
+      '<button class="gen-chip' + (!dexState.gen ? ' on' : '') + '" data-act="dex-gen" data-gen="0">전체</button>' +
+      Array.apply(null, Array(9)).map(function (_, k) {
+        var g = k + 1;
+        return '<button class="gen-chip' + (dexState.gen === g ? ' on' : '') + '" data-act="dex-gen" data-gen="' + g + '" style="--gen:' + GEN_COLORS[g] + '">' +
+          g + '세대<em>' + (D.GEN_COUNT[g] || 0) + '</em></button>';
       }).join('') +
       '</div>' +
-      (dexFilter ? '<div class="dex-filter-note">' + dexFilter + '세대 · ' + caughtInShown + ' / ' + shown.length + ' 마리</div>' : '') +
-      '<div class="dex-grid">';
-    shown.forEach(function (id) {
-      var got = isCaught(id);
-      html += '<button class="dex-item' + (got ? ' got' : '') + '" data-act="dex-item" data-id="' + id + '" aria-label="' + (got ? POKEMON[id].name + ' ' + genLabel(id) : '아직 못 만난 포켓몬') + '">' +
-        '<span class="dex-img-wrap">' + pokeImg(id, 'dex-img') + genBadge(id, 'corner') + '</span>' +
-        '<span class="dex-name">' + (got ? POKEMON[id].name : '???') + '</span>' +
-        '</button>';
-    });
-    html += '</div>' +
+      '<div class="dex-search"><span>🔍</span><input id="dex-search" type="search" inputmode="search" placeholder="이름이나 번호로 찾기" autocomplete="off" aria-label="포켓몬 찾기"></div>' +
+      '<div class="dex-filter-note" id="dex-note"></div>' +
+      '<div class="dex-grid" id="dex-grid"></div>' +
+      '<button class="dex-more" id="dex-more" data-act="dex-more" hidden>더 보기</button>' +
       '<div class="dex-btns">' +
       '<button class="ghost-btn" data-act="map">모험 지도</button>' +
       '<button class="ghost-btn" data-act="home">처음으로</button>' +
       '</div>' +
       '</section>';
     main.innerHTML = html;
+    renderDexGrid(true);
+    var input = document.getElementById('dex-search');
+    if (input) {
+      input.addEventListener('input', function () {
+        dexState.q = input.value;
+        renderDexGrid(true);
+      });
+    }
+    main.scrollTop = 0;
+  }
+
+  function renderDexGrid(reset) {
+    var grid = document.getElementById('dex-grid');
+    var more = document.getElementById('dex-more');
+    var note = document.getElementById('dex-note');
+    if (!grid) return;
+    if (reset) {
+      dexState.list = dexList();
+      dexState.shown = 0;
+      grid.innerHTML = '';
+    }
+    if (!dexState.list) dexState.list = dexList();
+    var list = dexState.list;
+    var end = Math.min(dexState.shown + DEX_CHUNK, list.length);
+    var html = '';
+    for (var i = dexState.shown; i < end; i++) {
+      var id = list[i];
+      var got = isCaught(id);
+      html += '<button class="dex-item' + (got ? ' got' : '') + '" data-act="dex-item" data-id="' + id + '" ' +
+        'aria-label="' + (got ? POKEMON[id].name + ' ' + genLabel(id) : '아직 못 만난 포켓몬') + '">' +
+        '<span class="dex-img-wrap">' + pokeImg(id, 'dex-img', { sprite: true, alt: got ? POKEMON[id].name : '???' }) + '</span>' +
+        '<span class="dex-name">' + (got ? POKEMON[id].name : '???') + '</span>' +
+        '<span class="dex-no">#' + String(id).padStart(4, '0') + '</span>' +
+        '</button>';
+    }
+    grid.insertAdjacentHTML('beforeend', html);
+    dexState.shown = end;
+    if (note) {
+      var caught = caughtOf(list);
+      note.textContent = (dexState.q ? '찾은 포켓몬 ' + list.length + '마리 · ' : '') + '잡은 ' + caught + ' / ' + list.length + '마리';
+    }
+    if (more) more.hidden = dexState.shown >= list.length;
+  }
+
+  function openDexDetail(id) {
+    var old = document.getElementById('dex-detail');
+    if (old) old.remove();
+    var p = POKEMON[id];
+    var got = isCaught(id);
+    var ov = document.createElement('div');
+    ov.className = 'detail-overlay';
+    ov.id = 'dex-detail';
+    ov.innerHTML =
+      '<div class="detail-card" role="dialog" aria-modal="true" aria-label="' + p.name + '">' +
+      '<button class="detail-close" data-act="close-detail" aria-label="닫기">✕</button>' +
+      '<div class="detail-art">' + pokeImg(id, 'detail-img') + '</div>' +
+      '<div class="detail-no">No.' + String(id).padStart(4, '0') + '</div>' +
+      '<div class="detail-name">' + (got ? p.name : '???') + '</div>' +
+      '<div class="detail-tags">' + genBadge(id) + typeChipsHTML(id) + '</div>' +
+      (got
+        ? '<button class="big-btn cry-btn" data-act="detail-cry" data-id="' + id + '">🔊 울음소리 듣기</button>'
+        : '<div class="detail-lock">아직 만나지 못했어요!<br>이름을 다 쓰면 도감에 담겨요</div>') +
+      '</div>';
+    document.body.appendChild(ov);
+    requestAnimationFrame(function () { ov.classList.add('show'); });
+    if (got) Cry.preload(id);
+  }
+
+  function closeDexDetail() {
+    var ov = document.getElementById('dex-detail');
+    if (!ov) return;
+    ov.classList.remove('show');
+    setTimeout(function () { ov.remove(); }, 180);
   }
 
   /* ---------------- 보호자 메뉴 ---------------- */
@@ -1429,12 +1670,13 @@
     overlay.innerHTML =
       '<div class="modal" role="dialog" aria-modal="true" aria-label="보호자 메뉴">' +
       '<div class="modal-title">보호자 메뉴</div>' +
-      '<div class="parent-stats">진행한 단계 <b>' + clearedCount() + ' / ' + STAGES.length + '</b> · 모은 별 <b>⭐' + totalStars() + '</b> · 잡은 포켓몬 <b>' + caughtCount() + '마리</b></div>' +
+      '<div class="parent-stats">진행한 단계 <b>' + clearedCount() + ' / ' + STAGES.length + '</b><br>' +
+      '모은 별 <b>⭐' + totalStars() + '</b> · 잡은 포켓몬 <b>' + caughtCount() + ' / ' + D.COUNT + '</b></div>' +
       '<button class="modal-btn" data-act="sound">' + (state.muted ? '🔇 소리 켜기' : '🔊 소리 끄기') + '</button>' +
       '<button class="modal-btn" data-act="unlock-all">🔓 전체 단계 열기</button>' +
       '<button class="modal-btn danger" data-act="reset-all">🧹 진행 기록 지우기</button>' +
       '<button class="modal-btn plain" data-act="close-parent">닫기</button>' +
-      '<div class="modal-note">진행 상황은 이 기기(브라우저)에만 저장돼요.</div>' +
+      '<div class="modal-note">진행 상황은 이 기기(브라우저)에만 저장돼요.<br>울음소리는 인터넷에서 받아 와요.</div>' +
       '</div>';
     document.body.appendChild(overlay);
     requestAnimationFrame(function () { overlay.classList.add('show'); });
@@ -1446,14 +1688,14 @@
     setTimeout(function () { overlay.remove(); }, 200);
   }
 
-  /* ---------------- 문제 음성 ---------------- */
+  /* ---------------- 음성 안내 ---------------- */
   function speakQuestion() {
     if (!T) return;
     var target = T.char || T.chars[T.targets[0]];
     if (T.guide === 'blank') {
       Speech.speak(T.pkm.name + '! 혼자서 써 볼까요?', { rate: 0.86 });
     } else {
-      Speech.speak(T.pkm.name + '! ' + target + '를 따라 써 봐요', { rate: 0.86 });
+      Speech.speak(T.pkm.name + '! ' + target + josa(target, '을', '를') + ' 따라 써 봐요', { rate: 0.86 });
     }
   }
 
@@ -1522,7 +1764,7 @@
     if (!t) return;
     var act = t.getAttribute('data-act');
 
-    if (act !== 'answer' && act !== 'dex-item' && act !== 'dex-filter') Sound.tap();
+    if (act !== 'answer' && act !== 'dex-item' && act !== 'dex-gen' && act !== 'cry' && act !== 'catch-cry' && act !== 'detail-cry') Sound.tap();
 
     switch (act) {
       case 'start':
@@ -1538,6 +1780,13 @@
         if (view === 'quiz') goMap();
         else goHome();
         break;
+      case 'pick-gen': {
+        var g = Number(t.getAttribute('data-gen')) || 0;
+        state.gen = g;
+        saveState();
+        goMap();
+        break;
+      }
       case 'stage': {
         var id = Number(t.getAttribute('data-id'));
         if (t.getAttribute('data-locked') === '1') {
@@ -1555,6 +1804,14 @@
       case 'replay':
         if (view === 'quiz') speakHint();
         break;
+      case 'cry': {
+        if (!T) break;
+        var cid = Number(t.getAttribute('data-id')) || T.q.id;
+        Cry.play(cid, function (status) {
+          if (status === 'fail') Speech.speak(POKEMON[cid].name);
+        });
+        break;
+      }
       case 'done':
         manualDone();
         break;
@@ -1567,22 +1824,41 @@
       case 'dex':
         goDex();
         break;
-      case 'dex-filter': {
-        dexFilter = Number(t.getAttribute('data-gen')) || 0;
+      case 'dex-gen': {
+        dexState.gen = Number(t.getAttribute('data-gen')) || 0;
+        state.gen = dexState.gen;
+        saveState();
         goDex();
         break;
       }
+      case 'dex-more':
+        renderDexGrid(false);
+        break;
       case 'dex-item': {
         var pid = Number(t.getAttribute('data-id'));
-        if (isCaught(pid)) {
-          Sound.pop();
-          t.classList.add('pulse');
-          setTimeout(function () { t.classList.remove('pulse'); }, 600);
-          Speech.speak(POKEMON[pid].name);
-        } else {
+        if (isCaught(pid)) openDexDetail(pid);
+        else {
           Sound.nudge();
           Speech.speak('아직 만나지 못했어요');
+          openDexDetail(pid);
         }
+        break;
+      }
+      case 'close-detail':
+        closeDexDetail();
+        break;
+      case 'detail-cry': {
+        var did = Number(t.getAttribute('data-id'));
+        Cry.play(did, function (status) {
+          if (status === 'fail') Speech.speak(POKEMON[did].name);
+        });
+        break;
+      }
+      case 'catch-cry': {
+        var kid = Number(t.getAttribute('data-id'));
+        Cry.play(kid, function (status) {
+          if (status === 'fail') Speech.speak(POKEMON[kid].name);
+        });
         break;
       }
       case 'parent':
@@ -1633,9 +1909,11 @@
   document.addEventListener('click', function (e) {
     var overlay = document.getElementById('parent-modal');
     if (overlay && e.target === overlay) closeParent();
+    var detail = document.getElementById('dex-detail');
+    if (detail && e.target === detail) closeDexDetail();
   });
 
-  /* 화면 크기가 바뀌면 칸 크기와 글자를 다시 맞춘다 */
+  /* 화면 크기가 바뮌면 칸 크기와 글자를 다시 맞춘다 */
   var resizeTimer = null;
   window.addEventListener('resize', function () {
     if (!T) return;
@@ -1675,7 +1953,7 @@
   if (location.hash.indexOf('debug') !== -1) {
     window.__trace = {
       info: function () {
-        if (!T) return null;
+        if (!T) return { view: view, stage: stage ? stage.data.id : 0, q: stage ? stage.index : -1, locked: true, ti: -1, caught: caughtCount() };
         var box = document.getElementById('box-wrap');
         var r = box ? box.getBoundingClientRect() : null;
         return {
@@ -1687,13 +1965,15 @@
           ti: T.ti,
           guide: T.guide,
           targets: T.targets.length,
-          cov: Number(T.cov.toFixed(3)),
+          cov: Number((T.cov || 0).toFixed(3)),
           need: (RECOG[T.stageId] || RECOG[1]).cov,
           strokes: T.strokes.length,
           locked: T.locked,
           hints: stage ? stage.hints : 0,
           clears: stage ? stage.clears : 0,
-          caught: state.caught.length,
+          caught: caughtCount(),
+          pokemon: T.q.id,
+          name: T.pkm.name,
           box: r ? { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) } : null
         };
       },
@@ -1730,7 +2010,32 @@
       goto: function (sid) { startStage(sid); },
       unlockAll: function () { state.unlocked = STAGES.length; saveState(); },
       need: function () { return (T && (RECOG[T.stageId] || RECOG[1])) || null; },
-      recog: RECOG
+      recog: RECOG,
+      pool: function (sid, gen) { return stagePool(sid, gen === undefined ? state.gen : gen).length; },
+      poolIds: function (sid, gen) { return stagePool(sid, gen === undefined ? state.gen : gen); },
+      lastCry: function () { return Cry.last; },
+      lastSpeech: function () { return Speech.last; },
+      cryFail: function (on) { Cry.forceFail = !!on; },
+      setGen: function (g) { state.gen = Number(g) || 0; saveState(); },
+      questions: function () { return stage ? stage.questions.map(function (q) { return q.id; }) : []; },
+      caughtIds: function () { return state.caught.slice(); },
+      clearStorage: function () { try { localStorage.removeItem(KEY); } catch (e) {} },
+      dexShown: function () { return { shown: dexState.shown, total: (dexState.list || []).length }; },
+      dexSearch: function (text) {
+        var input = document.getElementById('dex-search');
+        if (!input) return false;
+        input.value = text;
+        dexState.q = text;
+        renderDexGrid(true);
+        return true;
+      },
+      openDexDetail: openDexDetail,
+      previewQuestion: function (id, sid) {
+        var s = STAGES.filter(function (x) { return x.id === (sid || 1); })[0];
+        stage = { data: s, questions: [{ id: Number(id), trace: s.trace(POKEMON[Number(id)]) }], index: 0, hints: 0, clears: 0 };
+        view = 'quiz';
+        renderQuestion();
+      }
     };
   }
 

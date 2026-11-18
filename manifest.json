@@ -1,14 +1,14 @@
 {
   "name": "포켓몬 한글 따라쓰기",
   "short_name": "포켓몬 따라쓰기",
-  "description": "포켓몬 이름을 손가락으로 따라 쓰는 5살 한글 놀이",
+  "description": "포켓몬 이름을 손가락으로 따라 쓰는 5살 한글 놀이 - 전국도감 1025마리",
   "lang": "ko",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#7ed0ff",
-  "theme_color": "#7ed0ff",
+  "background_color": "#b9e8ff",
+  "theme_color": "#b9e8ff",
   "icons": [
     {
       "src": "icon.svg",

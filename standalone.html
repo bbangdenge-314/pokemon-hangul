@@ -4,28 +4,37 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <title>포켓몬 한글 따라쓰기 · 한 파일 버전</title>
-<meta name="description" content="5살 어린이를 위한 포켓몬 한글 따라쓰기 놀이 - 1~9세대 포켓몬 45마리와 함께 진한 글자 따라쓰기부터 가이드 없는 혼자 쓰기까지">
-<meta name="theme-color" content="#7ed0ff">
+<meta name="description" content="5살 어린이를 위한 포켓몬 한글 따라쓰기 놀이 - 1~9세대 전국도감 1025마리와 함께 첫 글자부터 가이드 없는 혼자 쓰기까지">
+<meta name="theme-color" content="#b9e8ff">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <link rel="icon shortcut" href="icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="icon.svg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="preconnect" href="https://raw.githubusercontent.com">
 <link href="https://fonts.googleapis.com/css2?family=Jua&display=swap" rel="stylesheet">
 
 <style>
-/* 포켓몬 한글 따라쓰기 - 스타일 */
+/* 포켓몬 한글 따라쓰기 - 스타일 (v4 · 밝고 귀여운 놀이방) */
 :root {
-  --sky1: #8fdcff;
-  --sky2: #e3f9ff;
-  --ink: #23324a;
-  --ink-soft: #4b5f7d;
-  --yellow: #ffd23f;
+  --ink: #4a3b52;
+  --ink-soft: #8b7d95;
+  --pink: #ff9ec4;
+  --pink-deep: #ff6fa5;
+  --sky: #7ccbff;
+  --sky-deep: #38a8f0;
+  --butter: #ffd166;
+  --butter-deep: #f0b400;
+  --mint: #7ee0b8;
+  --lilac: #b9a4ff;
+  --cream: #fffaf2;
   --white: #ffffff;
-  --line: #d3e6f5;
-  --theme: #4dabf7;
+  --theme: #ff9ec4;
+  --theme2: #ffe0ec;
   --safe-b: env(safe-area-inset-bottom, 0px);
+  --safe-t: env(safe-area-inset-top, 0px);
 }
 
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -41,7 +50,7 @@ html, body {
 body {
   font-family: 'Jua', 'Apple SD Gothic Neo', 'Malgun Gothic', 'Noto Sans KR', system-ui, sans-serif;
   color: var(--ink);
-  background: linear-gradient(180deg, var(--sky1) 0%, var(--sky2) 55%, #fdfbf3 100%);
+  background: linear-gradient(180deg, #c9ecff 0%, #ffe6f3 52%, #fff7e6 100%);
   -webkit-font-smoothing: antialiased;
   user-select: none;
   -webkit-user-select: none;
@@ -56,7 +65,9 @@ button {
   background: none;
   cursor: pointer;
   font-size: inherit;
+  padding: 0;
 }
+input { font-family: inherit; }
 
 #app {
   position: relative;
@@ -67,8 +78,11 @@ button {
   max-width: 560px;
   margin: 0 auto;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.35) 100%);
-  box-shadow: 0 0 60px rgba(35, 50, 74, 0.12);
+  background:
+    radial-gradient(circle at 12% 8%, rgba(255, 255, 255, 0.85) 0 8%, transparent 9%),
+    radial-gradient(circle at 88% 14%, rgba(255, 255, 255, 0.7) 0 6%, transparent 7%),
+    linear-gradient(180deg, #d6f1ff 0%, #ffe9f4 50%, #fff8ea 100%);
+  box-shadow: 0 0 70px rgba(98, 74, 110, 0.14);
 }
 
 #main {
@@ -78,6 +92,7 @@ button {
   overflow-y: auto;
   overflow-x: hidden;
   -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
 }
 
 /* ---------------- HUD ---------------- */
@@ -85,10 +100,10 @@ button {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: calc(10px + env(safe-area-inset-top, 0px)) 12px 8px;
+  padding: calc(8px + var(--safe-t)) 12px 8px;
   background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(8px);
-  border-bottom: 3px solid rgba(255, 255, 255, 0.9);
+  backdrop-filter: blur(10px);
+  border-bottom: 3px solid rgba(255, 255, 255, 0.95);
   z-index: 20;
   flex: 0 0 auto;
 }
@@ -98,15 +113,15 @@ button {
   height: 46px;
   flex: 0 0 46px;
   border-radius: 16px;
-  background: var(--white);
-  box-shadow: 0 3px 0 var(--line);
+  background: #fff;
+  box-shadow: 0 3px 0 #ffd9e8, inset 0 0 0 2px #fff;
   font-size: 22px;
   line-height: 1;
   display: grid;
   place-items: center;
   transition: transform .1s;
 }
-.hud-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 var(--line); }
+.hud-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #ffd9e8; }
 
 .hud-title {
   flex: 1;
@@ -116,23 +131,25 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
+  color: #6b5573;
 }
 
 .hud-right { display: flex; align-items: center; gap: 8px; }
 
 .star-chip {
-  font-size: 17px;
+  font-size: 16px;
   padding: 8px 12px;
-  border-radius: 14px;
-  background: #fff7d6;
-  box-shadow: inset 0 0 0 2px #ffe89a;
+  border-radius: 15px;
+  background: #fff8dc;
+  color: #a06d00;
+  box-shadow: inset 0 0 0 2px #ffe9a8;
   white-space: nowrap;
 }
 
 /* ---------------- 공통 ---------------- */
 .screen {
   min-height: 100%;
-  padding: 16px 16px calc(28px + var(--safe-b));
+  padding: 14px 16px calc(24px + var(--safe-b));
   display: flex;
   flex-direction: column;
   position: relative;
@@ -141,82 +158,141 @@ button {
 .big-btn {
   display: block;
   width: 100%;
-  min-height: 78px;
-  border-radius: 26px;
+  min-height: 76px;
+  border-radius: 28px;
   font-size: 28px;
   letter-spacing: -0.5px;
   transition: transform .1s, box-shadow .1s;
 }
 .big-btn.primary {
-  background: linear-gradient(180deg, #ffd75e, #ffb703);
-  color: #5a3b00;
-  box-shadow: 0 7px 0 #e09a00, 0 12px 22px rgba(255, 183, 3, 0.35);
+  background: linear-gradient(180deg, #ffd97a, #ffb627);
+  color: #6a4400;
+  box-shadow: 0 8px 0 #e8a000, 0 14px 26px rgba(255, 182, 39, 0.34), inset 0 2px 0 rgba(255, 255, 255, 0.7);
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.55);
 }
-.big-btn.primary:active { transform: translateY(5px); box-shadow: 0 2px 0 #e09a00; }
+.big-btn.primary:active { transform: translateY(5px); box-shadow: 0 3px 0 #e8a000; }
 
 .ghost-btn {
   min-height: 54px;
-  padding: 0 20px;
+  padding: 0 18px;
   border-radius: 20px;
-  font-size: 19px;
-  background: rgba(255, 255, 255, 0.9);
-  color: var(--ink-soft);
-  box-shadow: 0 4px 0 rgba(180, 205, 225, 0.6);
+  font-size: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  color: #6f5c78;
+  box-shadow: 0 4px 0 #ffd9e8;
   transition: transform .1s;
 }
-.ghost-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(180, 205, 225, 0.6); }
+.ghost-btn b { color: var(--pink-deep); }
+.ghost-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #ffd9e8; }
 
 .speaker-btn {
   border-radius: 50%;
   display: grid;
   place-items: center;
-  background: radial-gradient(circle at 35% 30%, #ffffff, #e9f5ff 70%);
-  box-shadow: 0 8px 0 #cbe3f7, 0 14px 24px rgba(35, 50, 74, 0.12);
+  background: radial-gradient(circle at 35% 28%, #ffffff, #ffeaf4 72%);
+  box-shadow: 0 5px 0 #ffd0e4, 0 10px 18px rgba(98, 74, 110, 0.10);
   transition: transform .1s;
 }
-.speaker-btn:active { transform: scale(.94); }
+.speaker-btn:active { transform: translateY(3px) scale(.96); box-shadow: 0 2px 0 #ffd0e4; }
 .speaker-btn.small {
-  width: 58px;
-  height: 58px;
-  flex: 0 0 58px;
-  font-size: 26px;
-  box-shadow: 0 5px 0 #cbe3f7;
+  width: 52px;
+  height: 52px;
+  flex: 0 0 52px;
+  font-size: 23px;
 }
-.speaker-btn.small:active { transform: translateY(3px); box-shadow: 0 2px 0 #cbe3f7; }
+
+.gen-badge {
+  display: inline-block;
+  font-size: 13px;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--gen, #b9a4ff);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+  vertical-align: middle;
+}
+.gen-badge.corner {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  font-size: 10px;
+  padding: 3px 6px;
+  opacity: .95;
+}
+.gen-badge.soft { background: #fff; color: var(--gen, #b9a4ff); box-shadow: inset 0 0 0 2px var(--gen, #b9a4ff); }
+
+.type-chips { display: inline-flex; gap: 4px; flex-wrap: wrap; vertical-align: middle; }
+.type-chip {
+  font-size: 13px;
+  line-height: 1;
+  padding: 5px 9px;
+  border-radius: 999px;
+  color: #fff;
+  background: var(--tc, #b3aea5);
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.12);
+}
+.type-chips.small .type-chip { font-size: 11px; padding: 4px 7px; }
+
+.star { display: inline-block; margin-left: 1px; }
+.star.on { color: #ffc107; text-shadow: 0 1px 0 #e39d00; }
+.star.off { color: #ecdfe9; }
+
+.img-fallback { opacity: .9; }
 
 /* ---------------- 홈 ---------------- */
 .home-screen {
   justify-content: center;
   align-items: center;
   text-align: center;
-  background: linear-gradient(180deg, #7ed0ff 0%, #b9ecff 45%, #e8fbe0 72%, #a8e46a 72%, #8ed14e 100%);
+  padding: 18px 18px calc(20px + var(--safe-b));
+  background:
+    linear-gradient(180deg, #b9e8ff 0%, #d9f4ff 34%, #ffeaf4 62%, #fff8ea 100%);
+  overflow: hidden;
 }
-.home-sky { position: absolute; inset: 0; pointer-events: none; }
+.home-bubbles { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+.home-bubbles i {
+  position: absolute;
+  bottom: -40px;
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 28%, #fff, rgba(255, 255, 255, 0.35));
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.7);
+  animation: bubbleUp 11s linear infinite;
+  opacity: .75;
+}
+.home-bubbles i:nth-child(1) { left: 8%; animation-duration: 13s; }
+.home-bubbles i:nth-child(2) { left: 26%; width: 16px; height: 16px; animation-duration: 9s; animation-delay: 2s; }
+.home-bubbles i:nth-child(3) { left: 52%; width: 34px; height: 34px; animation-duration: 15s; animation-delay: 4s; }
+.home-bubbles i:nth-child(4) { left: 74%; width: 20px; height: 20px; animation-duration: 10s; animation-delay: 1s; }
+.home-bubbles i:nth-child(5) { left: 88%; width: 28px; height: 28px; animation-duration: 14s; animation-delay: 6s; }
+@keyframes bubbleUp {
+  0% { transform: translateY(0) scale(.6); opacity: 0; }
+  12% { opacity: .8; }
+  100% { transform: translateY(-92vh) scale(1.05); opacity: 0; }
+}
+
 .home-cloud {
   position: absolute;
   background: #fff;
   border-radius: 999px;
-  opacity: .85;
-  filter: blur(0.3px);
-  animation: drift 26s linear infinite;
-}
-.home-cloud.c1 { width: 120px; height: 46px; top: 8%; left: -30%; animation-duration: 32s; }
-.home-cloud.c2 { width: 80px; height: 32px; top: 18%; left: -20%; animation-duration: 24s; animation-delay: 4s; }
-.home-cloud.c3 { width: 150px; height: 54px; top: 3%; left: -40%; animation-duration: 40s; animation-delay: 8s; }
-@keyframes drift { from { transform: translateX(0); } to { transform: translateX(260%); } }
-
-.home-grass {
-  position: absolute;
-  left: 0; right: 0; bottom: 0;
-  height: 28%;
-  background:
-    radial-gradient(circle at 12% 100%, #7cc63f 0 26px, transparent 27px),
-    radial-gradient(circle at 32% 100%, #7cc63f 0 30px, transparent 31px),
-    radial-gradient(circle at 60% 100%, #7cc63f 0 24px, transparent 25px),
-    radial-gradient(circle at 84% 100%, #7cc63f 0 28px, transparent 29px);
+  opacity: .9;
+  filter: blur(0.2px);
+  animation: drift 30s linear infinite;
   pointer-events: none;
-  opacity: .55;
 }
+.home-cloud::before, .home-cloud::after {
+  content: '';
+  position: absolute;
+  background: #fff;
+  border-radius: 50%;
+}
+.home-cloud::before { width: 60%; height: 160%; left: 12%; top: -70%; }
+.home-cloud::after { width: 44%; height: 130%; right: 10%; top: -50%; }
+.home-cloud.c1 { width: 122px; height: 42px; top: 7%; left: -40%; animation-duration: 36s; }
+.home-cloud.c2 { width: 82px; height: 30px; top: 17%; left: -30%; animation-duration: 26s; animation-delay: 3s; opacity: .75; }
+.home-cloud.c3 { width: 150px; height: 50px; top: 2%; left: -50%; animation-duration: 46s; animation-delay: 7s; opacity: .6; }
+@keyframes drift { from { transform: translateX(0); } to { transform: translateX(360%); } }
 
 .home-inner {
   position: relative;
@@ -225,224 +301,364 @@ button {
   flex-direction: column;
   align-items: center;
   width: 100%;
-  gap: 10px;
-  padding-bottom: 6px;
+  gap: 8px;
 }
 
 .home-badge {
-  font-size: 15px;
-  color: #2c6280;
-  background: rgba(255, 255, 255, 0.85);
+  font-size: 14px;
+  color: #3c7fa8;
+  background: rgba(255, 255, 255, 0.92);
   border-radius: 999px;
-  padding: 6px 16px;
-  box-shadow: 0 3px 0 rgba(255, 255, 255, 0.5);
+  padding: 7px 15px;
+  box-shadow: 0 3px 0 rgba(255, 255, 255, 0.6), inset 0 0 0 2px #e9f7ff;
 }
+.home-badge b { color: var(--pink-deep); font-size: 16px; }
 
 .home-title {
-  margin: 2px 0 0;
-  font-size: 44px;
-  line-height: 1.1;
-  letter-spacing: -1.5px;
-  color: #143d5c;
-  text-shadow: 0 3px 0 #fff, 0 6px 14px rgba(20, 61, 92, 0.18);
+  margin: 4px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  font-size: 40px;
+  line-height: 1.05;
+  letter-spacing: -1.6px;
+  color: #4a3b52;
+}
+.home-title span {
+  display: inline-block;
+  padding: 2px 10px 6px;
+  border-radius: 18px;
+  background: #fff;
+  box-shadow: 0 5px 0 #ffd9e8, inset 0 -3px 0 #fff0f6;
+  animation: titleBob 3.4s ease-in-out infinite;
+}
+.home-title span:nth-child(1) { color: #ff6fa5; transform: rotate(-2deg); }
+.home-title span:nth-child(2) { color: #38a8f0; transform: rotate(1.5deg); animation-delay: .2s; }
+.home-title span:nth-child(3) { color: #f0a500; transform: rotate(-1deg); animation-delay: .4s; }
+@keyframes titleBob {
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -5px; }
 }
 
 .home-hero {
+  position: relative;
   display: flex;
   align-items: flex-end;
   justify-content: center;
-  gap: 2px;
-  margin: 6px 0 2px;
+  gap: 0;
+  margin: 6px 0 0;
   width: 100%;
+  min-height: 150px;
 }
-.hero-poke { position: relative; }
-.hero-poke.big { width: 46%; animation: bob 2.6s ease-in-out infinite; z-index: 2; }
-.hero-poke.mini { width: 31%; animation: bob 3.2s ease-in-out infinite; animation-delay: .4s; }
-.hero-poke.big .hero-img { filter: drop-shadow(0 10px 10px rgba(20, 61, 92, 0.22)); }
+.hero-poke { position: relative; z-index: 1; }
+.hero-poke.big { width: 42%; animation: bob 2.8s ease-in-out infinite; z-index: 2; }
+.hero-poke.mini { width: 29%; animation: bob 3.4s ease-in-out infinite; animation-delay: .4s; }
+.hero-poke.big .hero-img { filter: drop-shadow(0 12px 12px rgba(74, 59, 82, 0.18)); }
 .hero-img { width: 100%; display: block; height: auto; }
-@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+.hero-ball {
+  position: absolute;
+  right: 1%;
+  top: 4%;
+  width: 46px;
+  height: 46px;
+  z-index: 0;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ff7ba9 0 46%, #4a3b52 46% 54%, #fff 54% 100%);
+  box-shadow: 0 0 0 4px #fff, 0 6px 12px rgba(74, 59, 82, 0.2);
+  animation: ballRoll 6s ease-in-out infinite;
+  overflow: hidden;
+}
+.hero-ball b {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 18px; height: 18px;
+  margin: -9px 0 0 -9px;
+  border-radius: 50%;
+  background: #fff;
+  border: 4px solid #4a3b52;
+}
+@keyframes ballRoll {
+  0%, 100% { transform: rotate(-12deg) translateY(0); }
+  50% { transform: rotate(12deg) translateY(-6px); }
+}
+@keyframes bob { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-9px); } }
 
 .home-sub {
-  margin: 2px 0 10px;
-  font-size: 19px;
-  color: #24506b;
-  text-shadow: 0 1px 0 rgba(255,255,255,.8);
+  margin: 2px 0 6px;
+  font-size: 18px;
+  color: #6b5573;
+  background: rgba(255, 255, 255, 0.72);
+  padding: 6px 16px;
+  border-radius: 999px;
 }
 
-.home-inner .big-btn { max-width: 400px; }
-.home-links { display: flex; gap: 10px; margin-top: 12px; flex-wrap: wrap; justify-content: center; }
+.home-inner .big-btn { max-width: 400px; animation: btnGlow 3.2s ease-in-out infinite; }
+@keyframes btnGlow {
+  0%, 100% { box-shadow: 0 8px 0 #e8a000, 0 14px 26px rgba(255, 182, 39, 0.34), inset 0 2px 0 rgba(255, 255, 255, 0.7); }
+  50% { box-shadow: 0 8px 0 #e8a000, 0 14px 34px rgba(255, 182, 39, 0.62), inset 0 2px 0 rgba(255, 255, 255, 0.8); }
+}
+.home-links { display: flex; gap: 10px; margin-top: 6px; flex-wrap: wrap; justify-content: center; }
+
+/* ---------------- 세대 고르기 ---------------- */
+.gen-pick {
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: 22px;
+  padding: 10px 10px 8px;
+  box-shadow: 0 4px 0 #ffe0ee;
+}
+.gen-pick-title { font-size: 14px; color: #8b7d95; margin: 0 4px 7px; }
+.gen-picker {
+  display: flex;
+  gap: 6px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+  scrollbar-width: none;
+  -webkit-mask-image: linear-gradient(to right, #000 0 94%, transparent 100%);
+  mask-image: linear-gradient(to right, #000 0 94%, transparent 100%);
+}
+.gen-picker::-webkit-scrollbar { display: none; }
+.gen-chip {
+  flex: 0 0 auto;
+  min-height: 40px;
+  padding: 6px 12px;
+  border-radius: 14px;
+  font-size: 14px;
+  line-height: 1.1;
+  color: #6f5c78;
+  background: #fff;
+  box-shadow: inset 0 0 0 2px #efe3ee, 0 3px 0 #efe3ee;
+  white-space: nowrap;
+  transition: transform .1s;
+}
+.gen-chip em { display: block; font-style: normal; font-size: 11px; color: #a695ae; }
+.gen-chip.on {
+  color: #fff;
+  background: var(--gen, var(--pink));
+  box-shadow: inset 0 0 0 2px #fff, 0 3px 0 rgba(0, 0, 0, 0.12);
+}
+.gen-chip.on em { color: rgba(255, 255, 255, 0.9); }
+.gen-chip:active { transform: translateY(2px); }
 
 /* ---------------- 지도 ---------------- */
-.map-screen { gap: 12px; }
-.map-top { display: flex; align-items: center; gap: 10px; }
+.map-screen { gap: 10px; }
+.map-top { display: flex; align-items: stretch; gap: 8px; }
 
 .map-progress {
   flex: 1;
-  background: rgba(255, 255, 255, 0.92);
-  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.94);
+  border-radius: 20px;
   padding: 10px 14px;
-  box-shadow: 0 4px 0 rgba(190, 215, 232, 0.7);
-  font-size: 16px;
+  box-shadow: 0 4px 0 #ffe0ee;
+  font-size: 15px;
   color: var(--ink-soft);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
 }
 .map-progress b { color: var(--ink); font-size: 19px; }
-.map-bar { margin-top: 8px; height: 12px; border-radius: 999px; background: #e6f1f9; overflow: hidden; }
+.map-bar { margin-top: 7px; height: 11px; border-radius: 999px; background: #f6eaf3; overflow: hidden; }
 .map-bar i {
   display: block;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #6bcb77, #ffd23f);
+  background: linear-gradient(90deg, #7ee0b8, #ffd166, #ff9ec4);
   transition: width .5s ease;
 }
 
 .dex-btn {
-  flex: 0 0 auto;
-  height: 62px;
-  padding: 0 16px;
+  flex: 0 0 86px;
+  height: auto;
   border-radius: 20px;
   background: #fff;
-  box-shadow: 0 4px 0 rgba(190, 215, 232, 0.8);
-  font-size: 18px;
+  box-shadow: 0 4px 0 #ffe0ee;
+  font-size: 13px;
+  color: #8b7d95;
+  line-height: 1.35;
+  padding: 6px 4px;
 }
+.dex-btn b { font-size: 19px; color: var(--pink-deep); }
 
-.stage-list { display: flex; flex-direction: column; gap: 12px; }
+.stage-list { display: flex; flex-direction: column; gap: 11px; }
 
 .stage-card {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 11px;
   width: 100%;
-  padding: 16px 16px 16px 14px;
+  padding: 13px 13px 13px 12px;
   border-radius: 26px;
   background: #fff;
   text-align: left;
-  box-shadow: 0 6px 0 var(--theme), 0 12px 22px rgba(35, 50, 74, 0.08);
-  border: 3px solid var(--theme);
+  box-shadow: 0 6px 0 var(--theme), 0 10px 20px rgba(98, 74, 110, 0.07);
+  border: 3px solid #fff;
   transition: transform .1s;
   overflow: hidden;
 }
-.stage-card:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--theme); }
-.stage-card.locked {
-  background: #f2f6fa;
-  border-color: #dbe6f0;
-  box-shadow: 0 5px 0 #dbe6f0;
-  opacity: .92;
-}
-.stage-card.cleared::after {
+.stage-card::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: linear-gradient(120deg, rgba(107, 203, 119, 0.10), transparent 60%);
-  pointer-events: none;
+  left: 0; top: 0; bottom: 0;
+  width: 9px;
+  background: var(--theme);
+  opacity: .35;
 }
+.stage-card:active { transform: translateY(4px); box-shadow: 0 2px 0 var(--theme); }
+.stage-card.locked {
+  background: #fbf6fb;
+  border-color: #f6f0f5;
+  box-shadow: 0 5px 0 #eadfe9;
+  opacity: .95;
+}
+.stage-card.locked::before { background: #d9ccd7; }
+.stage-card.cleared { background: linear-gradient(120deg, #fffdf5, #fff 60%); }
 
 .sc-num {
-  flex: 0 0 52px;
-  width: 52px;
-  height: 52px;
-  border-radius: 50%;
+  flex: 0 0 50px;
+  width: 50px;
+  height: 50px;
+  border-radius: 18px;
   display: grid;
   place-items: center;
-  font-size: 24px;
-  background: var(--theme);
-  color: #fff;
-  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.12);
+  font-size: 23px;
+  background: var(--theme2);
+  color: #7a5f86;
+  box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.05), inset 0 0 0 2px #fff;
 }
-.locked .sc-num { background: #cdd9e5; font-size: 20px; }
-.cleared .sc-num { background: #6bcb77; }
+.locked .sc-num { background: #f3ecf2; font-size: 19px; }
+.cleared .sc-num { background: var(--mint); color: #fff; }
 
-.sc-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px; }
-.sc-title { font-size: 21px; letter-spacing: -0.4px; }
-.sc-sub { font-size: 15px; color: #7a8fa6; }
-.sc-icon { font-size: 26px; opacity: .9; }
-.sc-stars { font-size: 15px; letter-spacing: 1px; margin-top: 1px; line-height: 1; }
-.sc-stars .star.off { color: #dde7f0; }
-
-.star { display: inline-block; margin-left: 1px; }
-.star.on { color: #ffc107; text-shadow: 0 1px 0 #e39d00; }
-.star.off { color: #e2ebf3; }
+.sc-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; }
+.sc-title { font-size: 20px; letter-spacing: -0.4px; color: #5a4564; }
+.sc-sub { font-size: 14px; color: #9a8ca3; }
+.sc-meta { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 1px; }
+.sc-stars { font-size: 14px; letter-spacing: 1px; line-height: 1; }
+.sc-pool {
+  font-size: 11px;
+  color: #a08fae;
+  background: #f8f1f8;
+  border-radius: 999px;
+  padding: 3px 8px;
+}
+.sc-icon { font-size: 24px; opacity: .9; }
 
 .map-next, .map-done {
   text-align: center;
-  font-size: 18px;
-  color: #35617e;
-  background: rgba(255, 255, 255, 0.75);
+  font-size: 16px;
+  color: #6b5573;
+  background: rgba(255, 255, 255, 0.85);
   border-radius: 18px;
-  padding: 12px;
+  padding: 11px;
 }
-.map-done { background: #fff4c2; color: #7a5b00; }
-.map-links { display: flex; gap: 10px; justify-content: center; margin-top: 4px; }
+.map-done { background: #fff3c4; color: #8a6400; }
+.map-links { display: flex; gap: 10px; justify-content: center; }
+.map-dex-note { text-align: center; font-size: 13px; color: #a08fae; }
+.map-dex-note b { color: var(--pink-deep); }
 
 /* ---------------- 따라쓰기 ---------------- */
 .trace-screen {
-  gap: 8px;
-  padding: 10px 14px calc(12px + var(--safe-b));
+  gap: 7px;
+  padding: 9px 14px calc(10px + var(--safe-b));
 }
 
-.q-top { display: flex; align-items: center; justify-content: space-between; font-size: 16px; color: var(--ink-soft); }
+.q-top { display: flex; align-items: center; gap: 9px; }
 .q-step {
   background: var(--theme);
   color: #fff;
-  padding: 5px 13px;
+  padding: 6px 12px;
   border-radius: 999px;
-  font-size: 15px;
+  font-size: 13px;
+  white-space: nowrap;
+  box-shadow: inset 0 -2px 0 rgba(0, 0, 0, 0.1);
 }
-.q-count { font-size: 17px; }
 .q-bar {
-  height: 12px;
-  background: rgba(255, 255, 255, 0.8);
+  flex: 1;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.9);
   border-radius: 999px;
   overflow: hidden;
-  box-shadow: inset 0 2px 4px rgba(35, 50, 74, 0.08);
+  box-shadow: inset 0 2px 3px rgba(98, 74, 110, 0.08);
 }
 .q-bar i {
   display: block;
   height: 100%;
-  background: linear-gradient(90deg, var(--theme), #ffe066);
+  background: linear-gradient(90deg, var(--theme), var(--butter));
   border-radius: 999px;
   transition: width .35s ease;
 }
+.q-count { font-size: 14px; color: #9a8ca3; white-space: nowrap; }
+.q-count b { font-size: 18px; color: #5a4564; }
 
-.poke-strip {
+.poke-card {
   display: flex;
   align-items: center;
-  gap: 10px;
-  background: rgba(255, 255, 255, 0.94);
+  gap: 9px;
+  background: rgba(255, 255, 255, 0.95);
   border-radius: 24px;
-  padding: 8px 10px;
-  box-shadow: 0 5px 0 rgba(196, 220, 238, 0.75);
-  border: 3px solid #fff;
+  padding: 7px 9px;
+  box-shadow: 0 5px 0 var(--theme2), inset 0 0 0 3px #fff;
+  border: 1px solid rgba(255, 255, 255, 0.7);
 }
-.strip-img { flex: 0 0 auto; width: 82px; height: 82px; display: grid; place-items: center; }
-.strip-poke { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 5px 6px rgba(35, 50, 74, 0.16)); animation: floatIn .4s ease both; }
-.strip-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px; }
-.strip-hint { font-size: 14px; color: #7d90a6; line-height: 1.25; }
+.poke-art {
+  position: relative;
+  flex: 0 0 auto;
+  width: 76px;
+  height: 76px;
+  border-radius: 20px;
+  background: radial-gradient(circle at 50% 42%, #fff 0%, var(--theme2) 130%);
+  display: grid;
+  place-items: center;
+  transition: transform .12s;
+}
+.poke-art:active { transform: scale(.94); }
+.strip-poke { width: 96%; height: 96%; object-fit: contain; filter: drop-shadow(0 4px 5px rgba(74, 59, 82, 0.18)); animation: floatIn .35s ease both; }
+@keyframes floatIn {
+  from { opacity: 0; transform: translateY(7px) scale(.9); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.art-badge {
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 9px;
+  color: #fff;
+  background: var(--theme);
+  padding: 2px 6px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
 
-.name-row { display: flex; gap: 5px; flex-wrap: nowrap; overflow: hidden; align-items: stretch; }
+.poke-body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 5px; }
+.strip-hint { font-size: 12px; color: #9a8ca3; line-height: 1.25; overflow: hidden; text-overflow: ellipsis; }
+
+.name-row { display: flex; gap: 4px; flex-wrap: nowrap; overflow: hidden; align-items: stretch; }
 .syl {
   display: grid;
   place-items: center;
-  min-width: 40px;
-  min-height: 40px;
-  padding: 1px 6px;
-  font-size: 26px;
+  min-width: 38px;
+  min-height: 38px;
+  padding: 1px 5px;
+  font-size: 25px;
   line-height: 1.1;
   border-radius: 12px;
-  color: #8fa3b7;
-  background: rgba(244, 249, 254, 0.9);
-  border: 2px dashed #cfdeeb;
-  transition: color .2s, background .2s, transform .2s, border-color .2s;
+  color: #b3a3bc;
+  background: #fbf6fb;
+  border: 2px dashed #ecdce9;
+  transition: color .2s, background .2s, transform .2s, border-color .2s, box-shadow .2s;
 }
-.name-row.len3 .syl { font-size: 24px; min-width: 36px; }
-.name-row.len4 .syl { font-size: 20px; min-width: 31px; padding: 1px 4px; }
-.name-row.len5 .syl { font-size: 17px; min-width: 26px; padding: 1px 3px; }
-.syl.fixed { color: #4b5f7d; background: #fff; border: 2px solid #e3eef8; }
-.syl.target { color: #23324a; background: #fffdf4; border: 2px solid #ffe59a; }
-.syl.target.now { background: #fff3bf; border: 3px solid #ffd43b; animation: sylPulse 1.3s ease-in-out infinite; }
+.name-row.len2 .syl { font-size: 26px; min-width: 42px; }
+.name-row.len3 .syl { font-size: 23px; min-width: 34px; padding: 1px 4px; }
+.name-row.len4 .syl { font-size: 19px; min-width: 28px; padding: 1px 3px; }
+.name-row.len5 .syl { font-size: 16px; min-width: 24px; padding: 1px 2px; }
+.name-row.len6 .syl { font-size: 13px; min-width: 20px; padding: 1px 1px; border-width: 1px; }
+.syl.fixed { color: #6f5c78; background: #fff; border: 2px solid #f3e8f1; }
+.syl.target { color: #5a4564; background: #fffdf4; border: 2px solid #ffe08a; }
+.syl.target.now { background: #fff5cc; border: 3px solid var(--butter); animation: sylPulse 1.4s ease-in-out infinite; box-shadow: 0 0 0 4px rgba(255, 209, 102, 0.18); }
 .syl.target.current { transform: translateY(-1px); }
-.syl.target.done { color: #2b8a3e; background: #d8f5dd; border: 2px solid #69db7c; animation: none; }
-.syl.blank { color: #b9a06b; background: #fffdf5; border: 2px dashed #e5c884; }
+.syl.target.done { color: #1e8e63; background: #ddfff0; border: 2px solid #7ee0b8; animation: none; }
+.syl.blank { color: #c2a35a; background: #fffdf5; border: 2px dashed #f0d494; }
 .syl.blank.now { background: #fff6d8; border: 3px dashed #f0b429; }
 @keyframes sylPulse {
   0%, 100% { transform: translateY(0) scale(1); }
@@ -456,7 +672,7 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 7px;
+  gap: 6px;
   padding: 2px 0;
 }
 
@@ -470,22 +686,21 @@ button {
   flex-wrap: wrap;
 }
 .check-msg {
-  font-size: 14px;
+  font-size: 13px;
   line-height: 1.25;
-  color: #2b8a3e;
+  color: #1e8e63;
   text-align: center;
-  max-width: 62%;
-  min-height: 0;
+  max-width: 64%;
 }
 .check-msg:empty { display: none; }
-.check-msg.warn { color: #c2410c; }
+.check-msg.warn { color: #d2601a; }
 .hint-btn {
   min-height: 40px;
   padding: 0 14px;
   border-radius: 14px;
-  font-size: 16px;
+  font-size: 15px;
   color: #8a5a00;
-  background: linear-gradient(180deg, #fff3d0, #ffe6a8);
+  background: linear-gradient(180deg, #fff4d4, #ffe3a3);
   box-shadow: 0 3px 0 #e8c36a;
 }
 .hint-btn:active { transform: translateY(2px); box-shadow: 0 1px 0 #e8c36a; }
@@ -494,24 +709,24 @@ button {
   position: relative;
   width: 300px;
   height: 300px;
-  border-radius: 30px;
+  border-radius: 34px;
   flex: 0 0 auto;
   transition: transform .18s;
 }
 .box-bg {
   position: absolute;
   inset: 0;
-  border-radius: 30px;
+  border-radius: 34px;
   background:
-    radial-gradient(circle at 50% 45%, #ffffff 0%, #f7fbff 70%, #eef7ff 100%);
-  box-shadow: inset 0 0 0 4px #e3f0fb, 0 8px 0 #d7e9f7, 0 14px 22px rgba(35, 50, 74, 0.08);
+    radial-gradient(circle at 50% 40%, #ffffff 0%, #fffcfa 62%, #fff3f9 100%);
+  box-shadow: inset 0 0 0 4px #ffe3f0, 0 8px 0 #ffd0e4, 0 16px 26px rgba(98, 74, 110, 0.10);
 }
 .guide-canvas,
 .hint-canvas,
 .ink-canvas {
   position: absolute;
   inset: 0;
-  border-radius: 30px;
+  border-radius: 34px;
   width: 100%;
   height: 100%;
 }
@@ -536,15 +751,15 @@ button {
 
 .box-wrap.blank-box .box-bg {
   background:
-    radial-gradient(circle at 50% 45%, #ffffff 0%, #fffdf6 68%, #fdf6e6 100%);
-  box-shadow: inset 0 0 0 4px #f3e6c8, 0 8px 0 #eddfbe, 0 14px 22px rgba(35, 50, 74, 0.08);
+    radial-gradient(circle at 50% 40%, #ffffff 0%, #fffdf6 64%, #fff7e4 100%);
+  box-shadow: inset 0 0 0 4px #ffeec4, 0 8px 0 #ffe0a8, 0 16px 26px rgba(98, 74, 110, 0.10);
 }
 .box-wrap.blank-box .box-bg::after {
   content: '';
   position: absolute;
   inset: 9%;
-  border-radius: 22px;
-  border: 3px dashed rgba(206, 186, 140, 0.55);
+  border-radius: 24px;
+  border: 3px dashed rgba(226, 196, 130, 0.5);
 }
 
 .start-dot {
@@ -553,392 +768,454 @@ button {
   height: 20px;
   margin: -10px 0 0 -10px;
   border-radius: 50%;
-  background: #ff5c8a;
-  box-shadow: 0 0 0 0 rgba(255, 92, 138, 0.55);
+  background: #ff6fa5;
+  box-shadow: 0 0 0 0 rgba(255, 111, 165, 0.55);
   animation: dotPulse 1.5s ease-out infinite;
   pointer-events: none;
 }
 @keyframes dotPulse {
-  0% { box-shadow: 0 0 0 0 rgba(255, 92, 138, 0.5); }
-  70% { box-shadow: 0 0 0 16px rgba(255, 92, 138, 0); }
-  100% { box-shadow: 0 0 0 0 rgba(255, 92, 138, 0); }
+  0% { box-shadow: 0 0 0 0 rgba(255, 111, 165, 0.5); }
+  70% { box-shadow: 0 0 0 16px rgba(255, 111, 165, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(255, 111, 165, 0); }
 }
 
-.box-wrap.almost .box-bg { box-shadow: inset 0 0 0 4px #b6e8c0, 0 8px 0 #cdeed3, 0 14px 22px rgba(43, 138, 62, 0.14); }
+.box-wrap.almost .box-bg { box-shadow: inset 0 0 0 4px #b6f0d6, 0 8px 0 #d4f7e8, 0 16px 26px rgba(30, 142, 99, 0.14); }
 .box-wrap.done { animation: boxDone .6s ease; }
-.box-wrap.done .box-bg { box-shadow: inset 0 0 0 5px #7ee081, 0 8px 0 #5ecb66, 0 14px 26px rgba(43, 138, 62, 0.22); }
+.box-wrap.done .box-bg { box-shadow: inset 0 0 0 5px #7ee0b8, 0 8px 0 #4cc79a, 0 16px 28px rgba(30, 142, 99, 0.22); }
 @keyframes boxDone { 0% { transform: scale(1); } 45% { transform: scale(1.045); } 100% { transform: scale(1); } }
-.box-wrap.hint-flash { animation: hintFlash .9s ease 2; }
-@keyframes hintFlash {
-  0%, 100% { box-shadow: none; }
-  50% { box-shadow: 0 0 0 8px rgba(255, 212, 59, 0.45); }
-}
 
 .cover-wrap {
   width: 74%;
   max-width: 340px;
-  height: 12px;
+  height: 11px;
   border-radius: 999px;
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: inset 0 2px 3px rgba(35, 50, 74, 0.09);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: inset 0 2px 3px rgba(98, 74, 110, 0.08);
   overflow: hidden;
 }
 .cover-bar {
   width: 0;
   height: 100%;
   border-radius: 999px;
-  background: linear-gradient(90deg, #74d680, #37b24d);
+  background: linear-gradient(90deg, #7ee0b8, #37c9a3);
   transition: width .18s ease;
 }
-.cover-label { font-size: 15px; color: #7d90a6; text-align: center; }
+.cover-label { font-size: 14px; color: #9a8ca3; text-align: center; }
 
-.trace-btns {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  width: 100%;
-}
-.trace-btns .big-btn { flex: 1; min-height: 66px; font-size: 25px; border-radius: 22px; }
+.trace-btns { display: flex; align-items: center; gap: 10px; width: 100%; }
+.trace-btns .big-btn { flex: 1; min-height: 64px; font-size: 24px; border-radius: 24px; }
 .round-btn {
   flex: 0 0 58px;
   width: 58px;
   height: 58px;
   border-radius: 50%;
-  font-size: 25px;
+  font-size: 24px;
   background: #fff;
-  color: var(--ink-soft);
-  box-shadow: 0 4px 0 rgba(190, 215, 232, 0.85);
+  color: #6f5c78;
+  box-shadow: 0 4px 0 #ffd0e4;
   display: grid;
   place-items: center;
   transition: transform .1s;
 }
-.round-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 rgba(190, 215, 232, 0.85); }
+.round-btn:active { transform: translateY(3px); box-shadow: 0 1px 0 #ffd0e4; }
 
 /* ---------------- 포켓몬 잡기 연출 ---------------- */
-.catch-overlay {
+.catch-overlay,
+.detail-overlay {
   position: fixed;
   inset: 0;
   display: grid;
   place-items: center;
-  background: rgba(18, 37, 56, 0.42);
-  backdrop-filter: blur(3px);
+  background: rgba(74, 59, 82, 0.42);
+  backdrop-filter: blur(4px);
   opacity: 0;
   transition: opacity .2s;
   z-index: 45;
-  padding: 20px;
+  padding: 18px;
 }
-.catch-overlay.show { opacity: 1; }
+.catch-overlay.show, .detail-overlay.show { opacity: 1; }
+
 .catch-card {
   position: relative;
-  width: min(86vw, 340px);
-  min-height: 316px;
-  padding: 168px 18px 18px;
-  border-radius: 30px;
-  background: radial-gradient(circle at 50% 25%, #fffdf2 0%, #fff8de 45%, #eaf7ff 100%);
-  box-shadow: 0 18px 40px rgba(15, 35, 55, 0.3);
+  width: min(88vw, 340px);
+  min-height: 330px;
+  padding: 172px 18px 18px;
+  border-radius: 32px;
+  background: radial-gradient(circle at 50% 22%, #fffef7 0%, #fff3fa 48%, #e8f8ff 100%);
+  box-shadow: 0 20px 44px rgba(50, 35, 60, 0.32), inset 0 0 0 4px #fff;
   text-align: center;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: flex-end;
-  gap: 4px;
-  transform: scale(.9);
+  gap: 5px;
+  transform: scale(.92);
   transition: transform .25s cubic-bezier(.2, 1.5, .4, 1);
+  overflow: hidden;
 }
-.catch-overlay.show .catch-card { transform: none; }
-
-.catch-ball {
+.catch-overlay.show .catch-card { transform: scale(1); }
+.catch-rays {
   position: absolute;
-  top: 48px;
+  left: 50%; top: 40%;
+  width: 340px; height: 340px;
+  margin: -170px 0 0 -170px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle, rgba(255, 236, 170, 0.85) 0 22%, rgba(255, 236, 170, 0.35) 45%, rgba(255, 236, 170, 0) 70%);
+  opacity: 0;
+  transform: scale(.6);
+  transition: opacity .5s ease, transform .6s cubic-bezier(.2, 1.4, .4, 1);
+}
+.catch-overlay.show .catch-rays { opacity: 1; transform: scale(1); }
+
+.catch-ball, .pokeball {
+  position: absolute;
   left: 50%;
-  margin-left: -44px;
-  width: 88px;
-  height: 88px;
+  top: 88px;
+  width: 118px;
+  height: 118px;
+  margin-left: -59px;
+  border-radius: 50%;
+  background: linear-gradient(180deg, #ff7ba9 0 45%, #4a3b52 45% 55%, #fff 55% 100%);
+  box-shadow: 0 0 0 5px #fff, 0 12px 22px rgba(50, 35, 60, 0.26);
+  overflow: hidden;
+  animation: ballShake .55s ease-in-out 3;
+  transform-origin: 50% 88%;
+}
+.catch-ball .pb-top, .pokeball .pb-top { position: absolute; inset: 0; background: linear-gradient(180deg, #ff9ec4, #ff6fa5); clip-path: inset(0 0 55% 0); }
+.catch-ball .pb-band, .pokeball .pb-band { position: absolute; left: 0; right: 0; top: 45%; height: 10%; background: #4a3b52; }
+.catch-ball .pb-btn, .pokeball .pb-btn {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 34px; height: 34px;
+  margin: -17px 0 0 -17px;
   border-radius: 50%;
   background: #fff;
-  border: 6px solid #2b2f3a;
-  overflow: hidden;
-  animation: ballWobble 1s ease-in-out infinite;
+  border: 7px solid #4a3b52;
+  box-sizing: content-box;
+  width: 22px; height: 22px;
+  margin: -18px 0 0 -18px;
 }
-.catch-ball.gone { display: none; }
-.catch-card .pb-top { position: absolute; left: 0; right: 0; top: 0; height: 50%; background: linear-gradient(180deg, #ff6b6b, #e03131); }
-.catch-card .pb-band { position: absolute; left: 0; right: 0; top: calc(50% - 6px); height: 12px; background: #2b2f3a; }
-.catch-card .pb-btn { position: absolute; left: 50%; top: 50%; width: 28px; height: 28px; margin: -14px 0 0 -14px; border-radius: 50%; background: #fff; border: 5px solid #2b2f3a; }
+.catch-ball.gone, .pokeball.gone { animation: ballOpen .4s ease forwards; opacity: 0; }
+@keyframes ballShake {
+  0%, 100% { transform: rotate(-14deg); }
+  50% { transform: rotate(14deg); }
+}
+@keyframes ballOpen {
+  0% { transform: scale(1); opacity: 1; }
+  60% { transform: scale(1.35); opacity: .7; }
+  100% { transform: scale(1.7); opacity: 0; }
+}
 
 .catch-poke {
   position: absolute;
-  top: 20px;
   left: 50%;
-  width: 152px;
-  margin-left: -76px;
+  top: 22px;
+  width: 176px;
+  height: 150px;
+  margin-left: -88px;
   opacity: 0;
-  transform: scale(.3);
-  transition: opacity .3s, transform .45s cubic-bezier(.2, 1.6, .4, 1);
-  pointer-events: none;
+  transform: scale(.35);
+  transition: opacity .3s ease, transform .45s cubic-bezier(.2, 1.7, .4, 1);
 }
 .catch-poke.show { opacity: 1; transform: scale(1); }
-.catch-img { width: 100%; height: auto; filter: drop-shadow(0 8px 10px rgba(35, 50, 74, 0.2)); }
-.catch-name { font-size: 30px; }
+.catch-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 8px 10px rgba(50, 35, 60, 0.24)); animation: bob 2.4s ease-in-out infinite; }
+
+.catch-name {
+  font-size: 32px;
+  letter-spacing: -0.8px;
+  color: #4a3b52;
+  text-shadow: 0 2px 0 #fff, 0 4px 10px rgba(74, 59, 82, 0.12);
+}
+.catch-tags { display: flex; align-items: center; gap: 5px; flex-wrap: wrap; justify-content: center; }
 .catch-tag {
-  font-size: 16px;
-  color: #7a5b00;
-  background: #fff4c2;
+  margin-top: 2px;
+  font-size: 15px;
+  color: #2b8a63;
+  background: #e2fff2;
+  padding: 5px 13px;
   border-radius: 999px;
-  padding: 4px 14px;
 }
-@keyframes ballWobble {
-  0%, 100% { transform: rotate(0deg); }
-  25% { transform: rotate(-12deg); }
-  75% { transform: rotate(12deg); }
+.catch-again {
+  margin-top: 4px;
+  min-height: 40px;
+  padding: 0 16px;
+  border-radius: 14px;
+  font-size: 15px;
+  color: #6f5c78;
+  background: #fff;
+  box-shadow: 0 3px 0 #ffd9e8;
 }
+.catch-again:active { transform: translateY(2px); box-shadow: 0 1px 0 #ffd9e8; }
 
 /* ---------------- 보상 ---------------- */
 .reward-screen {
   align-items: center;
   justify-content: center;
   text-align: center;
-  gap: 10px;
-  background: radial-gradient(circle at 50% 32%, #fffbe6 0%, #fff4c2 35%, #d8f3ff 100%);
+  gap: 8px;
+  background: radial-gradient(circle at 50% 30%, #fffef4 0%, #ffeef7 45%, #e6f8ff 100%);
 }
-
-.reward-stage { position: relative; width: 100%; height: 230px; display: grid; place-items: center; }
-
-.pokeball {
+.reward-sparks {
   position: absolute;
-  width: 146px;
-  height: 146px;
-  border-radius: 50%;
-  background: #fff;
-  border: 8px solid #2b2f3a;
-  overflow: hidden;
-  box-shadow: 0 12px 24px rgba(35, 50, 74, 0.22);
-  animation: ballWobble 1.1s ease-in-out infinite;
-  transition: opacity .35s;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 18% 22%, rgba(255, 209, 102, 0.55) 0 3px, transparent 4px),
+    radial-gradient(circle at 82% 18%, rgba(255, 158, 196, 0.55) 0 3px, transparent 4px),
+    radial-gradient(circle at 30% 74%, rgba(126, 224, 184, 0.55) 0 3px, transparent 4px),
+    radial-gradient(circle at 72% 68%, rgba(124, 203, 255, 0.55) 0 3px, transparent 4px);
+  animation: twinkle 3s ease-in-out infinite;
 }
-.pb-top { position: absolute; left: 0; right: 0; top: 0; height: 50%; background: linear-gradient(180deg, #ff6b6b, #e03131); }
-.pb-band { position: absolute; left: 0; right: 0; top: calc(50% - 9px); height: 18px; background: #2b2f3a; }
-.pb-btn { position: absolute; left: 50%; top: 50%; width: 46px; height: 46px; margin: -23px 0 0 -23px; border-radius: 50%; background: #fff; border: 7px solid #2b2f3a; }
-.pokeball.opening { animation: ballPop .45s ease forwards; }
-@keyframes ballPop { 0% { transform: scale(1); } 60% { transform: scale(1.25); } 100% { transform: scale(0); opacity: 0; } }
-.pokeball.gone { display: none; }
+@keyframes twinkle { 0%, 100% { opacity: .5; } 50% { opacity: 1; } }
 
+.reward-stage { position: relative; width: 240px; height: 200px; }
+.reward-stage .pokeball { top: 44px; margin-left: -59px; animation: ballShake .5s ease-in-out 2; }
+.reward-stage .pokeball.opening { animation: ballOpen .45s ease forwards; opacity: 0; }
 .reward-poke {
   position: absolute;
+  left: 50%;
+  top: 6px;
+  width: 200px;
+  height: 190px;
+  margin-left: -100px;
   opacity: 0;
-  transform: scale(.2);
-  transition: opacity .4s ease, transform .5s cubic-bezier(.2, 1.6, .4, 1);
+  transform: scale(.4);
+  transition: opacity .3s ease, transform .5s cubic-bezier(.2, 1.7, .4, 1);
 }
 .reward-poke.show { opacity: 1; transform: scale(1); }
-.reward-poke .reward-img { width: 215px; max-width: 60vw; height: auto; filter: drop-shadow(0 12px 16px rgba(35, 50, 74, 0.22)); animation: bob 2.4s ease-in-out infinite; }
-.reward-poke.bonus.show { transform: scale(.55) translate(120px, -70px); }
-.reward-poke.bonus .reward-img { width: 140px; }
+.reward-poke.bonus { width: 130px; height: 130px; margin-left: -65px; top: 96px; left: 84%; }
+.reward-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(74, 59, 82, 0.2)); animation: bob 2.6s ease-in-out infinite; }
 
-.reward-title {
-  margin: 6px 0 0;
-  font-size: 29px;
-  letter-spacing: -0.8px;
-  color: #1d4e6b;
-  text-shadow: 0 2px 0 #fff;
-  animation: floatIn .5s ease both;
-}
-.reward-stars { font-size: 34px; letter-spacing: 4px; }
-.reward-stars .star.on { color: #ffb703; text-shadow: 0 3px 0 #e08e00; }
-.reward-stars .star.off { color: #dfe7ef; }
-.reward-sub { font-size: 18px; color: #4a6c82; }
-.reward-btns { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 400px; margin-top: 6px; }
-.reward-btns .ghost-btn { width: 100%; }
-.reward-dex { font-size: 15px; color: #7a8fa6; }
-@keyframes floatIn { from { opacity: 0; transform: translateY(14px) scale(.94); } to { opacity: 1; transform: none; } }
+.reward-title { margin: 0; font-size: 28px; letter-spacing: -0.8px; color: #4a3b52; text-shadow: 0 2px 0 #fff; }
+.reward-stars { font-size: 34px; letter-spacing: 3px; line-height: 1; }
+.reward-sub { font-size: 16px; color: #7d6b86; }
+.reward-btns { display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 340px; margin-top: 4px; }
+.reward-dex { font-size: 14px; color: #9a8ca3; }
 
 /* ---------------- 도감 ---------------- */
-.dex-screen { gap: 12px; }
-.dex-head { display: flex; flex-direction: column; gap: 2px; align-items: center; }
-.dex-count { font-size: 22px; }
-.dex-count b { color: var(--theme); font-size: 30px; }
-.dex-hint { font-size: 15px; color: #7a8fa6; }
+.dex-screen { gap: 8px; }
+.dex-head {
+  background: rgba(255, 255, 255, 0.92);
+  border-radius: 22px;
+  padding: 11px 14px;
+  box-shadow: 0 4px 0 #ffe0ee;
+}
+.dex-count { font-size: 15px; color: #8b7d95; }
+.dex-count b { font-size: 24px; color: var(--pink-deep); }
+.dex-progress { margin-top: 6px; height: 11px; border-radius: 999px; background: #f6eaf3; overflow: hidden; }
+.dex-progress i { display: block; height: 100%; background: linear-gradient(90deg, #ff9ec4, #ffd166); border-radius: 999px; transition: width .4s ease; }
+.dex-hint { font-size: 12px; color: #a695ae; margin-top: 6px; }
 
-.dex-filter {
+.dex-gens { background: rgba(255, 255, 255, 0.8); border-radius: 18px; padding: 7px 8px; }
+
+.dex-search {
   display: flex;
-  gap: 6px;
-  overflow-x: auto;
-  padding: 2px 2px 6px;
-  scrollbar-width: none;
-}
-.dex-filter::-webkit-scrollbar { display: none; }
-.gen-chip {
-  flex: 0 0 auto;
-  min-height: 38px;
-  padding: 0 13px;
-  border-radius: 999px;
-  font-size: 15px;
-  color: var(--ink-soft);
+  align-items: center;
+  gap: 8px;
   background: #fff;
-  box-shadow: 0 3px 0 rgba(196, 218, 234, 0.9);
+  border-radius: 18px;
+  padding: 0 14px;
+  box-shadow: 0 3px 0 #ffe0ee;
+  min-height: 52px;
 }
-.gen-chip.on { color: #fff; background: var(--gen, #4dabf7); box-shadow: 0 3px 0 rgba(35, 50, 74, 0.18); }
-.dex-filter-note { font-size: 13.5px; color: #7a8fa6; text-align: center; margin-top: -4px; }
-
-.gen-badge {
-  display: inline-block;
-  font-size: 11px;
-  line-height: 1;
-  padding: 4px 7px;
-  border-radius: 999px;
-  color: #fff;
-  background: var(--gen, #495057);
-  vertical-align: middle;
+.dex-search span { font-size: 18px; opacity: .6; }
+.dex-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  font-size: 17px;
+  color: var(--ink);
+  min-height: 50px;
 }
-.gen-badge.corner { position: absolute; left: 5px; top: 5px; font-size: 10px; padding: 3px 6px; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18); }
-.gen-badge.soft { margin-left: 6px; }
-.reward-sub .gen-badge { margin-left: 4px; }
-.catch-card .gen-badge { margin: 2px 0 4px; }
+.dex-search input::placeholder { color: #c0b2c8; }
 
-.dex-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.dex-filter-note { font-size: 12px; color: #a695ae; padding: 0 4px; min-height: 15px; }
+
+.dex-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+  gap: 7px;
+}
 .dex-item {
+  position: relative;
+  background: #fff;
+  border-radius: 18px;
+  padding: 7px 4px 6px;
+  box-shadow: 0 3px 0 #f0e5ee;
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 2px;
-  padding: 8px 4px 10px;
-  border-radius: 20px;
-  background: #fff;
-  box-shadow: 0 4px 0 rgba(196, 218, 234, 0.9);
+  gap: 1px;
   transition: transform .1s;
-}
-.dex-item:active { transform: translateY(3px); }
-.dex-img-wrap {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 1 / 1;
-  display: grid;
-  place-items: center;
-  border-radius: 14px;
-  background: radial-gradient(circle at 50% 45%, #f7fbff, #e9f4fd);
   overflow: hidden;
 }
-.dex-img { width: 86%; height: auto; }
-.dex-item:not(.got) .dex-img { filter: brightness(0) opacity(.16); }
-.dex-name { font-size: 15px; color: var(--ink-soft); }
-.dex-item.got .dex-name { color: var(--ink); }
-.dex-item.pulse { animation: pop .5s ease; }
-.dex-btns { display: flex; gap: 10px; justify-content: center; margin-top: 4px; }
-@keyframes pop { 0% { transform: scale(1); } 45% { transform: scale(1.09); } 100% { transform: scale(1); } }
+.dex-item:active { transform: translateY(2px); }
+.dex-item.got { background: linear-gradient(160deg, #fffdf6, #fff); box-shadow: 0 3px 0 #ffe0b8; }
+.dex-img-wrap { width: 56px; height: 56px; display: grid; place-items: center; }
+.dex-img { width: 100%; height: 100%; object-fit: contain; }
+.dex-item:not(.got) .dex-img { filter: brightness(0) opacity(0.16); }
+.dex-name { font-size: 13px; color: #5a4564; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.dex-item:not(.got) .dex-name { color: #c0b2c8; }
+.dex-no { font-size: 9px; color: #b9a8c1; }
 
-/* ---------------- 모달 ---------------- */
+.dex-more {
+  min-height: 52px;
+  border-radius: 18px;
+  background: #fff;
+  color: #6f5c78;
+  font-size: 17px;
+  box-shadow: 0 4px 0 #ffe0ee;
+}
+.dex-btns { display: flex; gap: 10px; justify-content: center; margin-top: 4px; }
+
+/* 도감 상세 */
+.detail-card {
+  position: relative;
+  width: min(90vw, 360px);
+  padding: 20px 20px 22px;
+  border-radius: 32px;
+  background: radial-gradient(circle at 50% 18%, #fffef8 0%, #fff2f9 55%, #e9f8ff 100%);
+  box-shadow: 0 20px 44px rgba(50, 35, 60, 0.3), inset 0 0 0 4px #fff;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  transform: scale(.94);
+  transition: transform .25s cubic-bezier(.2, 1.5, .4, 1);
+}
+.detail-overlay.show .detail-card { transform: scale(1); }
+.detail-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  font-size: 18px;
+  color: #8b7d95;
+  background: #fff;
+  box-shadow: 0 3px 0 #ffe0ee;
+}
+.detail-art { width: 190px; height: 190px; display: grid; place-items: center; }
+.detail-img { width: 100%; height: 100%; object-fit: contain; filter: drop-shadow(0 10px 12px rgba(74, 59, 82, 0.18)); }
+.detail-no { font-size: 13px; color: #a695ae; letter-spacing: 1px; }
+.detail-name { font-size: 34px; letter-spacing: -1px; color: #4a3b52; }
+.detail-tags { display: flex; align-items: center; gap: 6px; justify-content: center; flex-wrap: wrap; }
+.cry-btn {
+  margin-top: 8px;
+  min-height: 62px;
+  font-size: 20px;
+  background: linear-gradient(180deg, #a8e9ff, #6cc9ff);
+  color: #0d5a82;
+  box-shadow: 0 6px 0 #3aa8e0, 0 12px 20px rgba(56, 168, 240, 0.25);
+}
+.cry-btn:active { transform: translateY(4px); box-shadow: 0 2px 0 #3aa8e0; }
+.detail-lock { margin-top: 8px; font-size: 15px; color: #a08fae; line-height: 1.5; }
+
+/* ---------------- 보호자 ---------------- */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(20, 40, 60, 0.45);
   display: grid;
   place-items: center;
-  padding: 20px;
+  background: rgba(74, 59, 82, 0.42);
+  backdrop-filter: blur(3px);
   opacity: 0;
   transition: opacity .2s;
   z-index: 50;
-  backdrop-filter: blur(2px);
+  padding: 18px;
 }
 .modal-overlay.show { opacity: 1; }
 .modal {
-  width: 100%;
-  max-width: 400px;
+  width: min(90vw, 360px);
   background: #fff;
-  border-radius: 28px;
-  padding: 20px;
+  border-radius: 30px;
+  padding: 20px 18px;
+  box-shadow: 0 20px 44px rgba(50, 35, 60, 0.3), inset 0 0 0 4px #fff;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.25);
-  transform: translateY(12px);
-  transition: transform .2s;
+  gap: 9px;
 }
-.modal-overlay.show .modal { transform: none; }
-.modal-title { font-size: 24px; text-align: center; }
+.modal-title { font-size: 22px; text-align: center; color: #5a4564; }
 .parent-stats {
-  font-size: 15px;
-  color: var(--ink-soft);
-  background: #f2f8fd;
+  font-size: 14px;
+  color: #7d6b86;
+  background: #fff7fb;
   border-radius: 14px;
-  padding: 10px;
+  padding: 10px 12px;
   text-align: center;
-  line-height: 1.5;
+  line-height: 1.6;
 }
-.parent-stats b { color: var(--ink); }
+.parent-stats b { color: #5a4564; }
 .modal-btn {
-  min-height: 56px;
+  min-height: 54px;
   border-radius: 18px;
-  background: #eef7ff;
-  font-size: 19px;
-  box-shadow: 0 3px 0 #d5e8f7;
-  transition: transform .1s;
+  font-size: 17px;
+  background: #fff;
+  color: #5a4564;
+  box-shadow: 0 3px 0 #ffe0ee, inset 0 0 0 2px #fff3f9;
 }
-.modal-btn:active { transform: translateY(2px); }
-.modal-btn.danger { background: #fff0f0; color: #c92a2a; box-shadow: 0 3px 0 #ffd6d6; }
-.modal-btn.danger.armed { background: #ff6b6b; color: #fff; box-shadow: 0 3px 0 #d63c3c; }
-.modal-btn.plain { background: #f5f7fa; color: #6b7d91; box-shadow: 0 3px 0 #e4e9ef; }
-.modal-note { font-size: 13px; color: #9aabbb; text-align: center; }
+.modal-btn.danger { color: #c2410c; box-shadow: 0 3px 0 #ffd6c2; }
+.modal-btn.danger.armed { background: #fff1e8; }
+.modal-btn.plain { background: #f8f2f8; box-shadow: none; }
+.modal-note { font-size: 12px; color: #a695ae; text-align: center; line-height: 1.5; }
 
-/* ---------------- 토스트 & 꽃가루 ---------------- */
+/* ---------------- 기타 ---------------- */
 .toast {
   position: fixed;
   left: 50%;
-  bottom: calc(104px + env(safe-area-inset-bottom, 0px));
-  transform: translate(-50%, 20px);
-  background: rgba(35, 50, 74, 0.94);
+  bottom: calc(24px + var(--safe-b));
+  transform: translate(-50%, 14px);
+  background: rgba(74, 59, 82, 0.94);
   color: #fff;
-  padding: 12px 20px;
-  border-radius: 999px;
-  font-size: 17px;
-  opacity: 0;
-  transition: opacity .25s, transform .25s;
-  z-index: 60;
-  pointer-events: none;
-  max-width: 90vw;
+  font-size: 15px;
+  padding: 12px 18px;
+  border-radius: 18px;
+  max-width: min(86vw, 420px);
   text-align: center;
+  opacity: 0;
+  transition: opacity .22s, transform .22s;
+  pointer-events: none;
+  z-index: 60;
+  box-shadow: 0 10px 24px rgba(50, 35, 60, 0.28);
 }
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-#confetti-layer { position: fixed; inset: 0; pointer-events: none; z-index: 40; overflow: hidden; }
+#confetti-layer { position: fixed; inset: 0; pointer-events: none; z-index: 55; overflow: hidden; }
 .confetti {
   position: absolute;
-  width: 11px;
-  height: 15px;
-  border-radius: 3px;
-  animation: fall var(--dur, 1.4s) cubic-bezier(.25, .6, .4, 1) forwards;
-  transform: translate(-50%, -50%);
+  width: 9px;
+  height: 13px;
+  border-radius: 2px;
+  will-change: transform;
+  animation: confettiFall var(--dur, 1.4s) cubic-bezier(.25, .6, .4, 1) forwards;
 }
-@keyframes fall {
-  0% { transform: translate(-50%, -50%) rotate(0deg) scale(1); opacity: 1; }
-  100% { transform: translate(calc(-50% + var(--dx, 0px)), calc(-50% + var(--dy, 320px))) rotate(var(--rot, 320deg)) scale(.8); opacity: 0; }
-}
-
-.img-fallback { opacity: .9; }
-
-/* 작은 화면 보정 */
-@media (max-height: 720px) {
-  .home-title { font-size: 37px; }
-  .poke-strip { padding: 6px 8px; }
-  .strip-img { width: 68px; height: 68px; }
-  .syl { font-size: 23px; }
-  .strip-hint { font-size: 13px; }
-  .dot { min-width: 30px; height: 30px; font-size: 16px; }
-  .cover-label { font-size: 14px; }
-  .trace-btns .big-btn { min-height: 60px; font-size: 22px; }
-  .round-btn { flex: 0 0 52px; width: 52px; height: 52px; font-size: 22px; }
-  .reward-stage { height: 200px; }
-  .reward-poke .reward-img { width: 175px; }
+@keyframes confettiFall {
+  0% { transform: translate(0, 0) rotate(0deg) scale(1); opacity: 1; }
+  100% { transform: translate(var(--dx, 0), var(--dy, 200px)) rotate(var(--rot, 180deg)) scale(.85); opacity: 0; }
 }
 
-@media (max-width: 400px) {
-  .poke-strip { gap: 7px; padding: 6px 8px; }
-  .strip-img { width: 64px; height: 64px; }
-  .speaker-btn.small { width: 48px; height: 48px; flex: 0 0 48px; font-size: 22px; }
-  .strip-hint { font-size: 12.5px; }
-  .name-row.len4 .syl { font-size: 19px; padding: 1px 3px; }
-  .trace-btns .big-btn { font-size: 23px; }
+@media (max-height: 700px) {
+  .home-title { font-size: 33px; }
+  .home-hero { min-height: 120px; }
+  .poke-art { width: 66px; height: 66px; }
+  .sc-title { font-size: 18px; }
+  .sc-sub { font-size: 13px; }
+  .big-btn { min-height: 66px; font-size: 25px; }
 }
 
-@media (min-width: 420px) {
-  .home-title { font-size: 48px; }
+@media (min-width: 480px) {
+  .home-title { font-size: 46px; }
+  .sc-title { font-size: 22px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .home-cloud, .home-bubbles i, .hero-poke, .hero-img, .catch-img, .reward-img,
+  .home-inner .big-btn, .home-title span, .hero-ball { animation: none !important; }
 }
 
 </style>
@@ -957,92 +1234,1117 @@ button {
   <div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
 </div>
 <script>
-/* 포켓몬 한글 따라쓰기 - 학습 데이터
-   포켓몬 이름(공식 한국어 명칭)과 번호, 세대는 PokeAPI(pokemon-species)에서 확인했습니다.
-   공식 아트워크 주소는 모두 HTTP 200 응답을 확인했습니다. */
+/* 포켓몬 전국도감 1~1025 — build/build_data.py 가 PokeAPI 자료로 만든 파일입니다. 직접 고치지 마세요.
+   LIST[번호-1] = [한국어 이름, 세대, 타입1, 타입2]  (타입2는 없으면 "") */
+window.POKEMON_DATA = {
+  COUNT: 1025,
+  LIST: [
+  ["이상해씨", 1, "풀", "독"],
+  ["이상해풀", 1, "풀", "독"],
+  ["이상해꽃", 1, "풀", "독"],
+  ["파이리", 1, "불꽃", ""],
+  ["리자드", 1, "불꽃", ""],
+  ["리자몽", 1, "불꽃", "비행"],
+  ["꼬부기", 1, "물", ""],
+  ["어니부기", 1, "물", ""],
+  ["거북왕", 1, "물", ""],
+  ["캐터피", 1, "벌레", ""],
+  ["단데기", 1, "벌레", ""],
+  ["버터플", 1, "벌레", "비행"],
+  ["뿔충이", 1, "벌레", "독"],
+  ["딱충이", 1, "벌레", "독"],
+  ["독침붕", 1, "벌레", "독"],
+  ["구구", 1, "노말", "비행"],
+  ["피죤", 1, "노말", "비행"],
+  ["피죤투", 1, "노말", "비행"],
+  ["꼬렛", 1, "노말", ""],
+  ["레트라", 1, "노말", ""],
+  ["깨비참", 1, "노말", "비행"],
+  ["깨비드릴조", 1, "노말", "비행"],
+  ["아보", 1, "독", ""],
+  ["아보크", 1, "독", ""],
+  ["피카츄", 1, "전기", ""],
+  ["라이츄", 1, "전기", ""],
+  ["모래두지", 1, "땅", ""],
+  ["고지", 1, "땅", ""],
+  ["니드런♀", 1, "독", ""],
+  ["니드리나", 1, "독", ""],
+  ["니드퀸", 1, "독", "땅"],
+  ["니드런♂", 1, "독", ""],
+  ["니드리노", 1, "독", ""],
+  ["니드킹", 1, "독", "땅"],
+  ["삐삐", 1, "페어리", ""],
+  ["픽시", 1, "페어리", ""],
+  ["식스테일", 1, "불꽃", ""],
+  ["나인테일", 1, "불꽃", ""],
+  ["푸린", 1, "노말", "페어리"],
+  ["푸크린", 1, "노말", "페어리"],
+  ["주뱃", 1, "독", "비행"],
+  ["골뱃", 1, "독", "비행"],
+  ["뚜벅쵸", 1, "풀", "독"],
+  ["냄새꼬", 1, "풀", "독"],
+  ["라플레시아", 1, "풀", "독"],
+  ["파라스", 1, "벌레", "풀"],
+  ["파라섹트", 1, "벌레", "풀"],
+  ["콘팡", 1, "벌레", "독"],
+  ["도나리", 1, "벌레", "독"],
+  ["디그다", 1, "땅", ""],
+  ["닥트리오", 1, "땅", ""],
+  ["나옹", 1, "노말", ""],
+  ["페르시온", 1, "노말", ""],
+  ["고라파덕", 1, "물", ""],
+  ["골덕", 1, "물", ""],
+  ["망키", 1, "격투", ""],
+  ["성원숭", 1, "격투", ""],
+  ["가디", 1, "불꽃", ""],
+  ["윈디", 1, "불꽃", ""],
+  ["발챙이", 1, "물", ""],
+  ["슈륙챙이", 1, "물", ""],
+  ["강챙이", 1, "물", "격투"],
+  ["캐이시", 1, "에스퍼", ""],
+  ["윤겔라", 1, "에스퍼", ""],
+  ["후딘", 1, "에스퍼", ""],
+  ["알통몬", 1, "격투", ""],
+  ["근육몬", 1, "격투", ""],
+  ["괴력몬", 1, "격투", ""],
+  ["모다피", 1, "풀", "독"],
+  ["우츠동", 1, "풀", "독"],
+  ["우츠보트", 1, "풀", "독"],
+  ["왕눈해", 1, "물", "독"],
+  ["독파리", 1, "물", "독"],
+  ["꼬마돌", 1, "바위", "땅"],
+  ["데구리", 1, "바위", "땅"],
+  ["딱구리", 1, "바위", "땅"],
+  ["포니타", 1, "불꽃", ""],
+  ["날쌩마", 1, "불꽃", ""],
+  ["야돈", 1, "물", "에스퍼"],
+  ["야도란", 1, "물", "에스퍼"],
+  ["코일", 1, "전기", "강철"],
+  ["레어코일", 1, "전기", "강철"],
+  ["파오리", 1, "노말", "비행"],
+  ["두두", 1, "노말", "비행"],
+  ["두트리오", 1, "노말", "비행"],
+  ["쥬쥬", 1, "물", ""],
+  ["쥬레곤", 1, "물", "얼음"],
+  ["질퍽이", 1, "독", ""],
+  ["질뻐기", 1, "독", ""],
+  ["셀러", 1, "물", ""],
+  ["파르셀", 1, "물", "얼음"],
+  ["고오스", 1, "고스트", "독"],
+  ["고우스트", 1, "고스트", "독"],
+  ["팬텀", 1, "고스트", "독"],
+  ["롱스톤", 1, "바위", "땅"],
+  ["슬리프", 1, "에스퍼", ""],
+  ["슬리퍼", 1, "에스퍼", ""],
+  ["크랩", 1, "물", ""],
+  ["킹크랩", 1, "물", ""],
+  ["찌리리공", 1, "전기", ""],
+  ["붐볼", 1, "전기", ""],
+  ["아라리", 1, "풀", "에스퍼"],
+  ["나시", 1, "풀", "에스퍼"],
+  ["탕구리", 1, "땅", ""],
+  ["텅구리", 1, "땅", ""],
+  ["시라소몬", 1, "격투", ""],
+  ["홍수몬", 1, "격투", ""],
+  ["내루미", 1, "노말", ""],
+  ["또가스", 1, "독", ""],
+  ["또도가스", 1, "독", ""],
+  ["뿔카노", 1, "땅", "바위"],
+  ["코뿌리", 1, "땅", "바위"],
+  ["럭키", 1, "노말", ""],
+  ["덩쿠리", 1, "풀", ""],
+  ["캥카", 1, "노말", ""],
+  ["쏘드라", 1, "물", ""],
+  ["시드라", 1, "물", ""],
+  ["콘치", 1, "물", ""],
+  ["왕콘치", 1, "물", ""],
+  ["별가사리", 1, "물", ""],
+  ["아쿠스타", 1, "물", "에스퍼"],
+  ["마임맨", 1, "에스퍼", "페어리"],
+  ["스라크", 1, "벌레", "비행"],
+  ["루주라", 1, "얼음", "에스퍼"],
+  ["에레브", 1, "전기", ""],
+  ["마그마", 1, "불꽃", ""],
+  ["쁘사이저", 1, "벌레", ""],
+  ["켄타로스", 1, "노말", ""],
+  ["잉어킹", 1, "물", ""],
+  ["갸라도스", 1, "물", "비행"],
+  ["라프라스", 1, "물", "얼음"],
+  ["메타몽", 1, "노말", ""],
+  ["이브이", 1, "노말", ""],
+  ["샤미드", 1, "물", ""],
+  ["쥬피썬더", 1, "전기", ""],
+  ["부스터", 1, "불꽃", ""],
+  ["폴리곤", 1, "노말", ""],
+  ["암나이트", 1, "바위", "물"],
+  ["암스타", 1, "바위", "물"],
+  ["투구", 1, "바위", "물"],
+  ["투구푸스", 1, "바위", "물"],
+  ["프테라", 1, "바위", "비행"],
+  ["잠만보", 1, "노말", ""],
+  ["프리져", 1, "얼음", "비행"],
+  ["썬더", 1, "전기", "비행"],
+  ["파이어", 1, "불꽃", "비행"],
+  ["미뇽", 1, "드래곤", ""],
+  ["신뇽", 1, "드래곤", ""],
+  ["망나뇽", 1, "드래곤", "비행"],
+  ["뮤츠", 1, "에스퍼", ""],
+  ["뮤", 1, "에스퍼", ""],
+  ["치코리타", 2, "풀", ""],
+  ["베이리프", 2, "풀", ""],
+  ["메가니움", 2, "풀", ""],
+  ["브케인", 2, "불꽃", ""],
+  ["마그케인", 2, "불꽃", ""],
+  ["블레이범", 2, "불꽃", ""],
+  ["리아코", 2, "물", ""],
+  ["엘리게이", 2, "물", ""],
+  ["장크로다일", 2, "물", ""],
+  ["꼬리선", 2, "노말", ""],
+  ["다꼬리", 2, "노말", ""],
+  ["부우부", 2, "노말", "비행"],
+  ["야부엉", 2, "노말", "비행"],
+  ["레디바", 2, "벌레", "비행"],
+  ["레디안", 2, "벌레", "비행"],
+  ["페이검", 2, "벌레", "독"],
+  ["아리아도스", 2, "벌레", "독"],
+  ["크로뱃", 2, "독", "비행"],
+  ["초라기", 2, "물", "전기"],
+  ["랜턴", 2, "물", "전기"],
+  ["피츄", 2, "전기", ""],
+  ["삐", 2, "페어리", ""],
+  ["푸푸린", 2, "노말", "페어리"],
+  ["토게피", 2, "페어리", ""],
+  ["토게틱", 2, "페어리", "비행"],
+  ["네이티", 2, "에스퍼", "비행"],
+  ["네이티오", 2, "에스퍼", "비행"],
+  ["메리프", 2, "전기", ""],
+  ["보송송", 2, "전기", ""],
+  ["전룡", 2, "전기", ""],
+  ["아르코", 2, "풀", ""],
+  ["마릴", 2, "물", "페어리"],
+  ["마릴리", 2, "물", "페어리"],
+  ["꼬지모", 2, "바위", ""],
+  ["왕구리", 2, "물", ""],
+  ["통통코", 2, "풀", "비행"],
+  ["두코", 2, "풀", "비행"],
+  ["솜솜코", 2, "풀", "비행"],
+  ["에이팜", 2, "노말", ""],
+  ["해너츠", 2, "풀", ""],
+  ["해루미", 2, "풀", ""],
+  ["왕자리", 2, "벌레", "비행"],
+  ["우파", 2, "물", "땅"],
+  ["누오", 2, "물", "땅"],
+  ["에브이", 2, "에스퍼", ""],
+  ["블래키", 2, "악", ""],
+  ["니로우", 2, "악", "비행"],
+  ["야도킹", 2, "물", "에스퍼"],
+  ["무우마", 2, "고스트", ""],
+  ["안농", 2, "에스퍼", ""],
+  ["마자용", 2, "에스퍼", ""],
+  ["키링키", 2, "노말", "에스퍼"],
+  ["피콘", 2, "벌레", ""],
+  ["쏘콘", 2, "벌레", "강철"],
+  ["노고치", 2, "노말", ""],
+  ["글라이거", 2, "땅", "비행"],
+  ["강철톤", 2, "강철", "땅"],
+  ["블루", 2, "페어리", ""],
+  ["그랑블루", 2, "페어리", ""],
+  ["침바루", 2, "물", "독"],
+  ["핫삼", 2, "벌레", "강철"],
+  ["단단지", 2, "벌레", "바위"],
+  ["헤라크로스", 2, "벌레", "격투"],
+  ["포푸니", 2, "악", "얼음"],
+  ["깜지곰", 2, "노말", ""],
+  ["링곰", 2, "노말", ""],
+  ["마그마그", 2, "불꽃", ""],
+  ["마그카르고", 2, "불꽃", "바위"],
+  ["꾸꾸리", 2, "얼음", "땅"],
+  ["메꾸리", 2, "얼음", "땅"],
+  ["코산호", 2, "물", "바위"],
+  ["총어", 2, "물", ""],
+  ["대포무노", 2, "물", ""],
+  ["딜리버드", 2, "얼음", "비행"],
+  ["만타인", 2, "물", "비행"],
+  ["무장조", 2, "강철", "비행"],
+  ["델빌", 2, "악", "불꽃"],
+  ["헬가", 2, "악", "불꽃"],
+  ["킹드라", 2, "물", "드래곤"],
+  ["코코리", 2, "땅", ""],
+  ["코리갑", 2, "땅", ""],
+  ["폴리곤2", 2, "노말", ""],
+  ["노라키", 2, "노말", ""],
+  ["루브도", 2, "노말", ""],
+  ["배루키", 2, "격투", ""],
+  ["카포에라", 2, "격투", ""],
+  ["뽀뽀라", 2, "얼음", "에스퍼"],
+  ["에레키드", 2, "전기", ""],
+  ["마그비", 2, "불꽃", ""],
+  ["밀탱크", 2, "노말", ""],
+  ["해피너스", 2, "노말", ""],
+  ["라이코", 2, "전기", ""],
+  ["앤테이", 2, "불꽃", ""],
+  ["스이쿤", 2, "물", ""],
+  ["애버라스", 2, "바위", "땅"],
+  ["데기라스", 2, "바위", "땅"],
+  ["마기라스", 2, "바위", "악"],
+  ["루기아", 2, "에스퍼", "비행"],
+  ["칠색조", 2, "불꽃", "비행"],
+  ["세레비", 2, "에스퍼", "풀"],
+  ["나무지기", 3, "풀", ""],
+  ["나무돌이", 3, "풀", ""],
+  ["나무킹", 3, "풀", ""],
+  ["아차모", 3, "불꽃", ""],
+  ["영치코", 3, "불꽃", "격투"],
+  ["번치코", 3, "불꽃", "격투"],
+  ["물짱이", 3, "물", ""],
+  ["늪짱이", 3, "물", "땅"],
+  ["대짱이", 3, "물", "땅"],
+  ["포챠나", 3, "악", ""],
+  ["그라에나", 3, "악", ""],
+  ["지그제구리", 3, "노말", ""],
+  ["직구리", 3, "노말", ""],
+  ["개무소", 3, "벌레", ""],
+  ["실쿤", 3, "벌레", ""],
+  ["뷰티플라이", 3, "벌레", "비행"],
+  ["카스쿤", 3, "벌레", ""],
+  ["독케일", 3, "벌레", "독"],
+  ["연꽃몬", 3, "물", "풀"],
+  ["로토스", 3, "물", "풀"],
+  ["로파파", 3, "물", "풀"],
+  ["도토링", 3, "풀", ""],
+  ["잎새코", 3, "풀", "악"],
+  ["다탱구", 3, "풀", "악"],
+  ["테일로", 3, "노말", "비행"],
+  ["스왈로", 3, "노말", "비행"],
+  ["갈모매", 3, "물", "비행"],
+  ["패리퍼", 3, "물", "비행"],
+  ["랄토스", 3, "에스퍼", "페어리"],
+  ["킬리아", 3, "에스퍼", "페어리"],
+  ["가디안", 3, "에스퍼", "페어리"],
+  ["비구술", 3, "벌레", "물"],
+  ["비나방", 3, "벌레", "비행"],
+  ["버섯꼬", 3, "풀", ""],
+  ["버섯모", 3, "풀", "격투"],
+  ["게을로", 3, "노말", ""],
+  ["발바로", 3, "노말", ""],
+  ["게을킹", 3, "노말", ""],
+  ["토중몬", 3, "벌레", "땅"],
+  ["아이스크", 3, "벌레", "비행"],
+  ["껍질몬", 3, "벌레", "고스트"],
+  ["소곤룡", 3, "노말", ""],
+  ["노공룡", 3, "노말", ""],
+  ["폭음룡", 3, "노말", ""],
+  ["마크탕", 3, "격투", ""],
+  ["하리뭉", 3, "격투", ""],
+  ["루리리", 3, "노말", "페어리"],
+  ["코코파스", 3, "바위", ""],
+  ["에나비", 3, "노말", ""],
+  ["델케티", 3, "노말", ""],
+  ["깜까미", 3, "악", "고스트"],
+  ["입치트", 3, "강철", "페어리"],
+  ["가보리", 3, "강철", "바위"],
+  ["갱도라", 3, "강철", "바위"],
+  ["보스로라", 3, "강철", "바위"],
+  ["요가랑", 3, "격투", "에스퍼"],
+  ["요가램", 3, "격투", "에스퍼"],
+  ["썬더라이", 3, "전기", ""],
+  ["썬더볼트", 3, "전기", ""],
+  ["플러시", 3, "전기", ""],
+  ["마이농", 3, "전기", ""],
+  ["볼비트", 3, "벌레", ""],
+  ["네오비트", 3, "벌레", ""],
+  ["로젤리아", 3, "풀", "독"],
+  ["꼴깍몬", 3, "독", ""],
+  ["꿀꺽몬", 3, "독", ""],
+  ["샤프니아", 3, "물", "악"],
+  ["샤크니아", 3, "물", "악"],
+  ["고래왕자", 3, "물", ""],
+  ["고래왕", 3, "물", ""],
+  ["둔타", 3, "불꽃", "땅"],
+  ["폭타", 3, "불꽃", "땅"],
+  ["코터스", 3, "불꽃", ""],
+  ["피그점프", 3, "에스퍼", ""],
+  ["피그킹", 3, "에스퍼", ""],
+  ["얼루기", 3, "노말", ""],
+  ["톱치", 3, "땅", ""],
+  ["비브라바", 3, "땅", "드래곤"],
+  ["플라이곤", 3, "땅", "드래곤"],
+  ["선인왕", 3, "풀", ""],
+  ["밤선인", 3, "풀", "악"],
+  ["파비코", 3, "노말", "비행"],
+  ["파비코리", 3, "드래곤", "비행"],
+  ["쟝고", 3, "노말", ""],
+  ["세비퍼", 3, "독", ""],
+  ["루나톤", 3, "바위", "에스퍼"],
+  ["솔록", 3, "바위", "에스퍼"],
+  ["미꾸리", 3, "물", "땅"],
+  ["메깅", 3, "물", "땅"],
+  ["가재군", 3, "물", ""],
+  ["가재장군", 3, "물", "악"],
+  ["오뚝군", 3, "땅", "에스퍼"],
+  ["점토도리", 3, "땅", "에스퍼"],
+  ["릴링", 3, "바위", "풀"],
+  ["릴리요", 3, "바위", "풀"],
+  ["아노딥스", 3, "바위", "벌레"],
+  ["아말도", 3, "바위", "벌레"],
+  ["빈티나", 3, "물", ""],
+  ["밀로틱", 3, "물", ""],
+  ["캐스퐁", 3, "노말", ""],
+  ["켈리몬", 3, "노말", ""],
+  ["어둠대신", 3, "고스트", ""],
+  ["다크펫", 3, "고스트", ""],
+  ["해골몽", 3, "고스트", ""],
+  ["미라몽", 3, "고스트", ""],
+  ["트로피우스", 3, "풀", "비행"],
+  ["치렁", 3, "에스퍼", ""],
+  ["앱솔", 3, "악", ""],
+  ["마자", 3, "에스퍼", ""],
+  ["눈꼬마", 3, "얼음", ""],
+  ["얼음귀신", 3, "얼음", ""],
+  ["대굴레오", 3, "얼음", "물"],
+  ["씨레오", 3, "얼음", "물"],
+  ["씨카이저", 3, "얼음", "물"],
+  ["진주몽", 3, "물", ""],
+  ["헌테일", 3, "물", ""],
+  ["분홍장이", 3, "물", ""],
+  ["시라칸", 3, "물", "바위"],
+  ["사랑동이", 3, "물", ""],
+  ["아공이", 3, "드래곤", ""],
+  ["쉘곤", 3, "드래곤", ""],
+  ["보만다", 3, "드래곤", "비행"],
+  ["메탕", 3, "강철", "에스퍼"],
+  ["메탕구", 3, "강철", "에스퍼"],
+  ["메타그로스", 3, "강철", "에스퍼"],
+  ["레지락", 3, "바위", ""],
+  ["레지아이스", 3, "얼음", ""],
+  ["레지스틸", 3, "강철", ""],
+  ["라티아스", 3, "드래곤", "에스퍼"],
+  ["라티오스", 3, "드래곤", "에스퍼"],
+  ["가이오가", 3, "물", ""],
+  ["그란돈", 3, "땅", ""],
+  ["레쿠쟈", 3, "드래곤", "비행"],
+  ["지라치", 3, "강철", "에스퍼"],
+  ["테오키스", 3, "에스퍼", ""],
+  ["모부기", 4, "풀", ""],
+  ["수풀부기", 4, "풀", ""],
+  ["토대부기", 4, "풀", "땅"],
+  ["불꽃숭이", 4, "불꽃", ""],
+  ["파이숭이", 4, "불꽃", "격투"],
+  ["초염몽", 4, "불꽃", "격투"],
+  ["팽도리", 4, "물", ""],
+  ["팽태자", 4, "물", ""],
+  ["엠페르트", 4, "물", "강철"],
+  ["찌르꼬", 4, "노말", "비행"],
+  ["찌르버드", 4, "노말", "비행"],
+  ["찌르호크", 4, "노말", "비행"],
+  ["비버니", 4, "노말", ""],
+  ["비버통", 4, "노말", "물"],
+  ["귀뚤뚜기", 4, "벌레", ""],
+  ["귀뚤톡크", 4, "벌레", ""],
+  ["꼬링크", 4, "전기", ""],
+  ["럭시오", 4, "전기", ""],
+  ["렌트라", 4, "전기", ""],
+  ["꼬몽울", 4, "풀", "독"],
+  ["로즈레이드", 4, "풀", "독"],
+  ["두개도스", 4, "바위", ""],
+  ["램펄드", 4, "바위", ""],
+  ["방패톱스", 4, "바위", "강철"],
+  ["바리톱스", 4, "바위", "강철"],
+  ["도롱충이", 4, "벌레", ""],
+  ["도롱마담", 4, "벌레", "풀"],
+  ["나메일", 4, "벌레", "비행"],
+  ["세꿀버리", 4, "벌레", "비행"],
+  ["비퀸", 4, "벌레", "비행"],
+  ["파치리스", 4, "전기", ""],
+  ["브이젤", 4, "물", ""],
+  ["플로젤", 4, "물", ""],
+  ["체리버", 4, "풀", ""],
+  ["체리꼬", 4, "풀", ""],
+  ["깝질무", 4, "물", ""],
+  ["트리토돈", 4, "물", "땅"],
+  ["겟핸보숭", 4, "노말", ""],
+  ["흔들풍손", 4, "고스트", "비행"],
+  ["둥실라이드", 4, "고스트", "비행"],
+  ["이어롤", 4, "노말", ""],
+  ["이어롭", 4, "노말", ""],
+  ["무우마직", 4, "고스트", ""],
+  ["돈크로우", 4, "악", "비행"],
+  ["나옹마", 4, "노말", ""],
+  ["몬냥이", 4, "노말", ""],
+  ["랑딸랑", 4, "에스퍼", ""],
+  ["스컹뿡", 4, "독", "악"],
+  ["스컹탱크", 4, "독", "악"],
+  ["동미러", 4, "강철", "에스퍼"],
+  ["동탁군", 4, "강철", "에스퍼"],
+  ["꼬지지", 4, "바위", ""],
+  ["흉내내", 4, "에스퍼", "페어리"],
+  ["핑복", 4, "노말", ""],
+  ["페라페", 4, "노말", "비행"],
+  ["화강돌", 4, "고스트", "악"],
+  ["딥상어동", 4, "드래곤", "땅"],
+  ["한바이트", 4, "드래곤", "땅"],
+  ["한카리아스", 4, "드래곤", "땅"],
+  ["먹고자", 4, "노말", ""],
+  ["리오르", 4, "격투", ""],
+  ["루카리오", 4, "격투", "강철"],
+  ["히포포타스", 4, "땅", ""],
+  ["하마돈", 4, "땅", ""],
+  ["스콜피", 4, "독", "벌레"],
+  ["드래피온", 4, "독", "악"],
+  ["삐딱구리", 4, "독", "격투"],
+  ["독개굴", 4, "독", "격투"],
+  ["무스틈니", 4, "풀", ""],
+  ["형광어", 4, "물", ""],
+  ["네오라이트", 4, "물", ""],
+  ["타만타", 4, "물", "비행"],
+  ["눈쓰개", 4, "풀", "얼음"],
+  ["눈설왕", 4, "풀", "얼음"],
+  ["포푸니라", 4, "악", "얼음"],
+  ["자포코일", 4, "전기", "강철"],
+  ["내룸벨트", 4, "노말", ""],
+  ["거대코뿌리", 4, "땅", "바위"],
+  ["덩쿠림보", 4, "풀", ""],
+  ["에레키블", 4, "전기", ""],
+  ["마그마번", 4, "불꽃", ""],
+  ["토게키스", 4, "페어리", "비행"],
+  ["메가자리", 4, "벌레", "비행"],
+  ["리피아", 4, "풀", ""],
+  ["글레이시아", 4, "얼음", ""],
+  ["글라이온", 4, "땅", "비행"],
+  ["맘모꾸리", 4, "얼음", "땅"],
+  ["폴리곤Z", 4, "노말", ""],
+  ["엘레이드", 4, "에스퍼", "격투"],
+  ["대코파스", 4, "바위", "강철"],
+  ["야느와르몽", 4, "고스트", ""],
+  ["눈여아", 4, "얼음", "고스트"],
+  ["로토무", 4, "전기", "고스트"],
+  ["유크시", 4, "에스퍼", ""],
+  ["엠라이트", 4, "에스퍼", ""],
+  ["아그놈", 4, "에스퍼", ""],
+  ["디아루가", 4, "강철", "드래곤"],
+  ["펄기아", 4, "물", "드래곤"],
+  ["히드런", 4, "불꽃", "강철"],
+  ["레지기가스", 4, "노말", ""],
+  ["기라티나", 4, "고스트", "드래곤"],
+  ["크레세리아", 4, "에스퍼", ""],
+  ["피오네", 4, "물", ""],
+  ["마나피", 4, "물", ""],
+  ["다크라이", 4, "악", ""],
+  ["쉐이미", 4, "풀", ""],
+  ["아르세우스", 4, "노말", ""],
+  ["비크티니", 5, "에스퍼", "불꽃"],
+  ["주리비얀", 5, "풀", ""],
+  ["샤비", 5, "풀", ""],
+  ["샤로다", 5, "풀", ""],
+  ["뚜꾸리", 5, "불꽃", ""],
+  ["차오꿀", 5, "불꽃", "격투"],
+  ["염무왕", 5, "불꽃", "격투"],
+  ["수댕이", 5, "물", ""],
+  ["쌍검자비", 5, "물", ""],
+  ["대검귀", 5, "물", ""],
+  ["보르쥐", 5, "노말", ""],
+  ["보르그", 5, "노말", ""],
+  ["요테리", 5, "노말", ""],
+  ["하데리어", 5, "노말", ""],
+  ["바랜드", 5, "노말", ""],
+  ["쌔비냥", 5, "악", ""],
+  ["레파르다스", 5, "악", ""],
+  ["야나프", 5, "풀", ""],
+  ["야나키", 5, "풀", ""],
+  ["바오프", 5, "불꽃", ""],
+  ["바오키", 5, "불꽃", ""],
+  ["앗차프", 5, "물", ""],
+  ["앗차키", 5, "물", ""],
+  ["몽나", 5, "에스퍼", ""],
+  ["몽얌나", 5, "에스퍼", ""],
+  ["콩둘기", 5, "노말", "비행"],
+  ["유토브", 5, "노말", "비행"],
+  ["켄호로우", 5, "노말", "비행"],
+  ["줄뮤마", 5, "전기", ""],
+  ["제브라이카", 5, "전기", ""],
+  ["단굴", 5, "바위", ""],
+  ["암트르", 5, "바위", ""],
+  ["기가이어스", 5, "바위", ""],
+  ["또르박쥐", 5, "에스퍼", "비행"],
+  ["맘박쥐", 5, "에스퍼", "비행"],
+  ["두더류", 5, "땅", ""],
+  ["몰드류", 5, "땅", "강철"],
+  ["다부니", 5, "노말", ""],
+  ["으랏차", 5, "격투", ""],
+  ["토쇠골", 5, "격투", ""],
+  ["노보청", 5, "격투", ""],
+  ["동챙이", 5, "물", ""],
+  ["두까비", 5, "물", "땅"],
+  ["두빅굴", 5, "물", "땅"],
+  ["던지미", 5, "격투", ""],
+  ["타격귀", 5, "격투", ""],
+  ["두르보", 5, "벌레", "풀"],
+  ["두르쿤", 5, "벌레", "풀"],
+  ["모아머", 5, "벌레", "풀"],
+  ["마디네", 5, "벌레", "독"],
+  ["휠구", 5, "벌레", "독"],
+  ["펜드라", 5, "벌레", "독"],
+  ["소미안", 5, "풀", "페어리"],
+  ["엘풍", 5, "풀", "페어리"],
+  ["치릴리", 5, "풀", ""],
+  ["드레디어", 5, "풀", ""],
+  ["배쓰나이", 5, "물", ""],
+  ["깜눈크", 5, "땅", "악"],
+  ["악비르", 5, "땅", "악"],
+  ["악비아르", 5, "땅", "악"],
+  ["달막화", 5, "불꽃", ""],
+  ["불비달마", 5, "불꽃", ""],
+  ["마라카치", 5, "풀", ""],
+  ["돌살이", 5, "벌레", "바위"],
+  ["암팰리스", 5, "벌레", "바위"],
+  ["곤율랭", 5, "악", "격투"],
+  ["곤율거니", 5, "악", "격투"],
+  ["심보러", 5, "에스퍼", "비행"],
+  ["데스마스", 5, "고스트", ""],
+  ["데스니칸", 5, "고스트", ""],
+  ["프로토가", 5, "물", "바위"],
+  ["늑골라", 5, "물", "바위"],
+  ["아켄", 5, "바위", "비행"],
+  ["아케오스", 5, "바위", "비행"],
+  ["깨봉이", 5, "독", ""],
+  ["더스트나", 5, "독", ""],
+  ["조로아", 5, "악", ""],
+  ["조로아크", 5, "악", ""],
+  ["치라미", 5, "노말", ""],
+  ["치라치노", 5, "노말", ""],
+  ["고디탱", 5, "에스퍼", ""],
+  ["고디보미", 5, "에스퍼", ""],
+  ["고디모아젤", 5, "에스퍼", ""],
+  ["유니란", 5, "에스퍼", ""],
+  ["듀란", 5, "에스퍼", ""],
+  ["란쿨루스", 5, "에스퍼", ""],
+  ["꼬지보리", 5, "물", "비행"],
+  ["스완나", 5, "물", "비행"],
+  ["바닐프티", 5, "얼음", ""],
+  ["바닐리치", 5, "얼음", ""],
+  ["배바닐라", 5, "얼음", ""],
+  ["사철록", 5, "노말", "풀"],
+  ["바라철록", 5, "노말", "풀"],
+  ["에몽가", 5, "전기", "비행"],
+  ["딱정곤", 5, "벌레", ""],
+  ["슈바르고", 5, "벌레", "강철"],
+  ["깜놀버슬", 5, "풀", "독"],
+  ["뽀록나", 5, "풀", "독"],
+  ["탱그릴", 5, "물", "고스트"],
+  ["탱탱겔", 5, "물", "고스트"],
+  ["맘복치", 5, "물", ""],
+  ["파쪼옥", 5, "벌레", "전기"],
+  ["전툴라", 5, "벌레", "전기"],
+  ["철시드", 5, "풀", "강철"],
+  ["너트령", 5, "풀", "강철"],
+  ["기어르", 5, "강철", ""],
+  ["기기어르", 5, "강철", ""],
+  ["기기기어르", 5, "강철", ""],
+  ["저리어", 5, "전기", ""],
+  ["저리릴", 5, "전기", ""],
+  ["저리더프", 5, "전기", ""],
+  ["리그레", 5, "에스퍼", ""],
+  ["벰크", 5, "에스퍼", ""],
+  ["불켜미", 5, "고스트", "불꽃"],
+  ["램프라", 5, "고스트", "불꽃"],
+  ["샹델라", 5, "고스트", "불꽃"],
+  ["터검니", 5, "드래곤", ""],
+  ["액슨도", 5, "드래곤", ""],
+  ["액스라이즈", 5, "드래곤", ""],
+  ["코고미", 5, "얼음", ""],
+  ["툰베어", 5, "얼음", ""],
+  ["프리지오", 5, "얼음", ""],
+  ["쪼마리", 5, "벌레", ""],
+  ["어지리더", 5, "벌레", ""],
+  ["메더", 5, "땅", "전기"],
+  ["비조푸", 5, "격투", ""],
+  ["비조도", 5, "격투", ""],
+  ["크리만", 5, "드래곤", ""],
+  ["골비람", 5, "땅", "고스트"],
+  ["골루그", 5, "땅", "고스트"],
+  ["자망칼", 5, "악", "강철"],
+  ["절각참", 5, "악", "강철"],
+  ["버프론", 5, "노말", ""],
+  ["수리둥보", 5, "노말", "비행"],
+  ["워글", 5, "노말", "비행"],
+  ["벌차이", 5, "악", "비행"],
+  ["버랜지나", 5, "악", "비행"],
+  ["앤티골", 5, "불꽃", ""],
+  ["아이앤트", 5, "벌레", "강철"],
+  ["모노두", 5, "악", "드래곤"],
+  ["디헤드", 5, "악", "드래곤"],
+  ["삼삼드래", 5, "악", "드래곤"],
+  ["활화르바", 5, "벌레", "불꽃"],
+  ["불카모스", 5, "벌레", "불꽃"],
+  ["코바르온", 5, "강철", "격투"],
+  ["테라키온", 5, "바위", "격투"],
+  ["비리디온", 5, "풀", "격투"],
+  ["토네로스", 5, "비행", ""],
+  ["볼트로스", 5, "전기", "비행"],
+  ["레시라무", 5, "드래곤", "불꽃"],
+  ["제크로무", 5, "드래곤", "전기"],
+  ["랜드로스", 5, "땅", "비행"],
+  ["큐레무", 5, "드래곤", "얼음"],
+  ["케르디오", 5, "물", "격투"],
+  ["메로엣타", 5, "노말", "에스퍼"],
+  ["게노세크트", 5, "벌레", "강철"],
+  ["도치마론", 6, "풀", ""],
+  ["도치보구", 6, "풀", ""],
+  ["브리가론", 6, "풀", "격투"],
+  ["푸호꼬", 6, "불꽃", ""],
+  ["테르나", 6, "불꽃", ""],
+  ["마폭시", 6, "불꽃", "에스퍼"],
+  ["개구마르", 6, "물", ""],
+  ["개굴반장", 6, "물", ""],
+  ["개굴닌자", 6, "물", "악"],
+  ["파르빗", 6, "노말", ""],
+  ["파르토", 6, "노말", "땅"],
+  ["화살꼬빈", 6, "노말", "비행"],
+  ["불화살빈", 6, "불꽃", "비행"],
+  ["파이어로", 6, "불꽃", "비행"],
+  ["분이벌레", 6, "벌레", ""],
+  ["분떠도리", 6, "벌레", ""],
+  ["비비용", 6, "벌레", "비행"],
+  ["레오꼬", 6, "불꽃", "노말"],
+  ["화염레오", 6, "불꽃", "노말"],
+  ["플라베베", 6, "페어리", ""],
+  ["플라엣테", 6, "페어리", ""],
+  ["플라제스", 6, "페어리", ""],
+  ["메이클", 6, "풀", ""],
+  ["고고트", 6, "풀", ""],
+  ["판짱", 6, "격투", ""],
+  ["부란다", 6, "격투", "악"],
+  ["트리미앙", 6, "노말", ""],
+  ["냐스퍼", 6, "에스퍼", ""],
+  ["냐오닉스", 6, "에스퍼", ""],
+  ["단칼빙", 6, "강철", "고스트"],
+  ["쌍검킬", 6, "강철", "고스트"],
+  ["킬가르도", 6, "강철", "고스트"],
+  ["슈쁘", 6, "페어리", ""],
+  ["프레프티르", 6, "페어리", ""],
+  ["나룸퍼프", 6, "페어리", ""],
+  ["나루림", 6, "페어리", ""],
+  ["오케이징", 6, "악", "에스퍼"],
+  ["칼라마네로", 6, "악", "에스퍼"],
+  ["거북손손", 6, "바위", "물"],
+  ["거북손데스", 6, "바위", "물"],
+  ["수레기", 6, "독", "물"],
+  ["드래캄", 6, "독", "드래곤"],
+  ["완철포", 6, "물", ""],
+  ["블로스터", 6, "물", ""],
+  ["목도리키텔", 6, "전기", "노말"],
+  ["일레도리자드", 6, "전기", "노말"],
+  ["티고라스", 6, "바위", "드래곤"],
+  ["견고라스", 6, "바위", "드래곤"],
+  ["아마루스", 6, "바위", "얼음"],
+  ["아마루르가", 6, "바위", "얼음"],
+  ["님피아", 6, "페어리", ""],
+  ["루차불", 6, "격투", "비행"],
+  ["데덴네", 6, "전기", "페어리"],
+  ["멜리시", 6, "바위", "페어리"],
+  ["미끄메라", 6, "드래곤", ""],
+  ["미끄네일", 6, "드래곤", ""],
+  ["미끄래곤", 6, "드래곤", ""],
+  ["클레피", 6, "강철", "페어리"],
+  ["나목령", 6, "고스트", "풀"],
+  ["대로트", 6, "고스트", "풀"],
+  ["호바귀", 6, "고스트", "풀"],
+  ["펌킨인", 6, "고스트", "풀"],
+  ["꽁어름", 6, "얼음", ""],
+  ["크레베이스", 6, "얼음", ""],
+  ["음뱃", 6, "비행", "드래곤"],
+  ["음번", 6, "비행", "드래곤"],
+  ["제르네아스", 6, "페어리", ""],
+  ["이벨타르", 6, "악", "비행"],
+  ["지가르데", 6, "드래곤", "땅"],
+  ["디안시", 6, "바위", "페어리"],
+  ["후파", 6, "에스퍼", "고스트"],
+  ["볼케니온", 6, "불꽃", "물"],
+  ["나몰빼미", 7, "풀", "비행"],
+  ["빼미스로우", 7, "풀", "비행"],
+  ["모크나이퍼", 7, "풀", "고스트"],
+  ["냐오불", 7, "불꽃", ""],
+  ["냐오히트", 7, "불꽃", ""],
+  ["어흥염", 7, "불꽃", "악"],
+  ["누리공", 7, "물", ""],
+  ["키요공", 7, "물", ""],
+  ["누리레느", 7, "물", "페어리"],
+  ["콕코구리", 7, "노말", "비행"],
+  ["크라파", 7, "노말", "비행"],
+  ["왕큰부리", 7, "노말", "비행"],
+  ["영구스", 7, "노말", ""],
+  ["형사구스", 7, "노말", ""],
+  ["턱지충이", 7, "벌레", ""],
+  ["전지충이", 7, "벌레", "전기"],
+  ["투구뿌논", 7, "벌레", "전기"],
+  ["오기지게", 7, "격투", ""],
+  ["모단단게", 7, "격투", "얼음"],
+  ["춤추새", 7, "불꽃", "비행"],
+  ["에블리", 7, "벌레", "페어리"],
+  ["에리본", 7, "벌레", "페어리"],
+  ["암멍이", 7, "바위", ""],
+  ["루가루암", 7, "바위", ""],
+  ["약어리", 7, "물", ""],
+  ["시마사리", 7, "독", "물"],
+  ["더시마사리", 7, "독", "물"],
+  ["머드나기", 7, "땅", ""],
+  ["만마드", 7, "땅", ""],
+  ["물거미", 7, "물", "벌레"],
+  ["깨비물거미", 7, "물", "벌레"],
+  ["짜랑랑", 7, "풀", ""],
+  ["라란티스", 7, "풀", ""],
+  ["자마슈", 7, "풀", "페어리"],
+  ["마셰이드", 7, "풀", "페어리"],
+  ["야도뇽", 7, "독", "불꽃"],
+  ["염뉴트", 7, "독", "불꽃"],
+  ["포곰곰", 7, "노말", "격투"],
+  ["이븐곰", 7, "노말", "격투"],
+  ["달콤아", 7, "풀", ""],
+  ["달무리나", 7, "풀", ""],
+  ["달코퀸", 7, "풀", ""],
+  ["큐아링", 7, "페어리", ""],
+  ["하랑우탄", 7, "노말", "에스퍼"],
+  ["내던숭이", 7, "격투", ""],
+  ["꼬시레", 7, "벌레", "물"],
+  ["갑주무사", 7, "벌레", "물"],
+  ["모래꿍", 7, "고스트", "땅"],
+  ["모래성이당", 7, "고스트", "땅"],
+  ["해무기", 7, "물", ""],
+  ["타입:널", 7, "노말", ""],
+  ["실버디", 7, "노말", ""],
+  ["메테노", 7, "바위", "비행"],
+  ["자말라", 7, "노말", ""],
+  ["폭거북스", 7, "불꽃", "드래곤"],
+  ["토게데마루", 7, "전기", "강철"],
+  ["따라큐", 7, "고스트", "페어리"],
+  ["치갈기", 7, "물", "에스퍼"],
+  ["할비롱", 7, "노말", "드래곤"],
+  ["타타륜", 7, "고스트", "풀"],
+  ["짜랑꼬", 7, "드래곤", ""],
+  ["짜랑고우", 7, "드래곤", "격투"],
+  ["짜랑고우거", 7, "드래곤", "격투"],
+  ["카푸꼬꼬꼭", 7, "전기", "페어리"],
+  ["카푸나비나", 7, "에스퍼", "페어리"],
+  ["카푸브루루", 7, "풀", "페어리"],
+  ["카푸느지느", 7, "물", "페어리"],
+  ["코스모그", 7, "에스퍼", ""],
+  ["코스모움", 7, "에스퍼", ""],
+  ["솔가레오", 7, "에스퍼", "강철"],
+  ["루나아라", 7, "에스퍼", "고스트"],
+  ["텅비드", 7, "바위", "독"],
+  ["매시붕", 7, "벌레", "격투"],
+  ["페로코체", 7, "벌레", "격투"],
+  ["전수목", 7, "전기", ""],
+  ["철화구야", 7, "강철", "비행"],
+  ["종이신도", 7, "풀", "강철"],
+  ["악식킹", 7, "악", "드래곤"],
+  ["네크로즈마", 7, "에스퍼", ""],
+  ["마기아나", 7, "강철", "페어리"],
+  ["마샤도", 7, "격투", "고스트"],
+  ["베베놈", 7, "독", ""],
+  ["아고용", 7, "독", "드래곤"],
+  ["차곡차곡", 7, "바위", "강철"],
+  ["두파팡", 7, "불꽃", "고스트"],
+  ["제라오라", 7, "전기", ""],
+  ["멜탄", 7, "강철", ""],
+  ["멜메탈", 7, "강철", ""],
+  ["흥나숭", 8, "풀", ""],
+  ["채키몽", 8, "풀", ""],
+  ["고릴타", 8, "풀", ""],
+  ["염버니", 8, "불꽃", ""],
+  ["래비풋", 8, "불꽃", ""],
+  ["에이스번", 8, "불꽃", ""],
+  ["울머기", 8, "물", ""],
+  ["누겔레온", 8, "물", ""],
+  ["인텔리레온", 8, "물", ""],
+  ["탐리스", 8, "노말", ""],
+  ["요씽리스", 8, "노말", ""],
+  ["파라꼬", 8, "비행", ""],
+  ["파크로우", 8, "비행", ""],
+  ["아머까오", 8, "비행", "강철"],
+  ["두루지벌레", 8, "벌레", ""],
+  ["레돔벌레", 8, "벌레", "에스퍼"],
+  ["이올브", 8, "벌레", "에스퍼"],
+  ["훔처우", 8, "악", ""],
+  ["폭슬라이", 8, "악", ""],
+  ["꼬모카", 8, "풀", ""],
+  ["백솜모카", 8, "풀", ""],
+  ["우르", 8, "노말", ""],
+  ["배우르", 8, "노말", ""],
+  ["깨물부기", 8, "물", ""],
+  ["갈가부기", 8, "물", "바위"],
+  ["멍파치", 8, "전기", ""],
+  ["펄스멍", 8, "전기", ""],
+  ["탄동", 8, "바위", ""],
+  ["탄차곤", 8, "바위", "불꽃"],
+  ["석탄산", 8, "바위", "불꽃"],
+  ["과사삭벌레", 8, "풀", "드래곤"],
+  ["애프룡", 8, "풀", "드래곤"],
+  ["단지래플", 8, "풀", "드래곤"],
+  ["모래뱀", 8, "땅", ""],
+  ["사다이사", 8, "땅", ""],
+  ["윽우지", 8, "비행", "물"],
+  ["찌로꼬치", 8, "물", ""],
+  ["꼬치조", 8, "물", ""],
+  ["일레즌", 8, "전기", "독"],
+  ["스트린더", 8, "전기", "독"],
+  ["태우지네", 8, "불꽃", "벌레"],
+  ["다태우지네", 8, "불꽃", "벌레"],
+  ["때때무노", 8, "격투", ""],
+  ["케오퍼스", 8, "격투", ""],
+  ["데인차", 8, "고스트", ""],
+  ["포트데스", 8, "고스트", ""],
+  ["몸지브림", 8, "에스퍼", ""],
+  ["손지브림", 8, "에스퍼", ""],
+  ["브리무음", 8, "에스퍼", "페어리"],
+  ["메롱꿍", 8, "악", "페어리"],
+  ["쏘겨모", 8, "악", "페어리"],
+  ["오롱털", 8, "악", "페어리"],
+  ["가로막구리", 8, "악", "노말"],
+  ["나이킹", 8, "강철", ""],
+  ["산호르곤", 8, "고스트", ""],
+  ["창파나이트", 8, "격투", ""],
+  ["마임꽁꽁", 8, "얼음", "에스퍼"],
+  ["데스판", 8, "땅", "고스트"],
+  ["마빌크", 8, "페어리", ""],
+  ["마휘핑", 8, "페어리", ""],
+  ["대여르", 8, "격투", ""],
+  ["찌르성게", 8, "전기", ""],
+  ["누니머기", 8, "얼음", "벌레"],
+  ["모스노우", 8, "얼음", "벌레"],
+  ["돌헨진", 8, "바위", ""],
+  ["빙큐보", 8, "얼음", ""],
+  ["에써르", 8, "에스퍼", "노말"],
+  ["모르페코", 8, "전기", "악"],
+  ["끼리동", 8, "강철", ""],
+  ["대왕끼리동", 8, "강철", ""],
+  ["파치래곤", 8, "전기", "드래곤"],
+  ["파치르돈", 8, "전기", "얼음"],
+  ["어래곤", 8, "물", "드래곤"],
+  ["어치르돈", 8, "물", "얼음"],
+  ["두랄루돈", 8, "강철", "드래곤"],
+  ["드라꼰", 8, "드래곤", "고스트"],
+  ["드래런치", 8, "드래곤", "고스트"],
+  ["드래펄트", 8, "드래곤", "고스트"],
+  ["자시안", 8, "페어리", ""],
+  ["자마젠타", 8, "격투", ""],
+  ["무한다이노", 8, "독", "드래곤"],
+  ["치고마", 8, "격투", ""],
+  ["우라오스", 8, "격투", "악"],
+  ["자루도", 8, "악", "풀"],
+  ["레지에레키", 8, "전기", ""],
+  ["레지드래고", 8, "드래곤", ""],
+  ["블리자포스", 8, "얼음", ""],
+  ["레이스포스", 8, "고스트", ""],
+  ["버드렉스", 8, "에스퍼", "풀"],
+  ["신비록", 8, "노말", "에스퍼"],
+  ["사마자르", 8, "벌레", "바위"],
+  ["다투곰", 8, "땅", "노말"],
+  ["대쓰여너", 8, "물", "고스트"],
+  ["포푸니크", 8, "격투", "독"],
+  ["장침바루", 8, "악", "독"],
+  ["러브로스", 8, "페어리", "비행"],
+  ["나오하", 9, "풀", ""],
+  ["나로테", 9, "풀", ""],
+  ["마스카나", 9, "풀", "악"],
+  ["뜨아거", 9, "불꽃", ""],
+  ["악뜨거", 9, "불꽃", ""],
+  ["라우드본", 9, "불꽃", "고스트"],
+  ["꾸왁스", 9, "물", ""],
+  ["아꾸왁", 9, "물", ""],
+  ["웨이니발", 9, "물", "격투"],
+  ["맛보돈", 9, "노말", ""],
+  ["퍼퓨돈", 9, "노말", ""],
+  ["타랜툴라", 9, "벌레", ""],
+  ["트래피더", 9, "벌레", ""],
+  ["콩알뚜기", 9, "벌레", ""],
+  ["엑스레그", 9, "벌레", "악"],
+  ["빠모", 9, "전기", ""],
+  ["빠모트", 9, "전기", "격투"],
+  ["빠르모트", 9, "전기", "격투"],
+  ["두리쥐", 9, "노말", ""],
+  ["파밀리쥐", 9, "노말", ""],
+  ["쫀도기", 9, "페어리", ""],
+  ["바우첼", 9, "페어리", ""],
+  ["미니브", 9, "풀", "노말"],
+  ["올리뇨", 9, "풀", "노말"],
+  ["올리르바", 9, "풀", "노말"],
+  ["시비꼬", 9, "노말", "비행"],
+  ["베베솔트", 9, "바위", ""],
+  ["스태솔트", 9, "바위", ""],
+  ["콜로솔트", 9, "바위", ""],
+  ["카르본", 9, "불꽃", ""],
+  ["카디나르마", 9, "불꽃", "에스퍼"],
+  ["파라블레이즈", 9, "불꽃", "고스트"],
+  ["빈나두", 9, "전기", ""],
+  ["찌리배리", 9, "전기", ""],
+  ["찌리비", 9, "전기", "비행"],
+  ["찌리비크", 9, "전기", "비행"],
+  ["오라티프", 9, "악", ""],
+  ["마피티프", 9, "악", ""],
+  ["땃쭈르", 9, "독", "노말"],
+  ["태깅구르", 9, "독", "노말"],
+  ["그푸리", 9, "풀", "고스트"],
+  ["공푸리", 9, "풀", "고스트"],
+  ["들눈해", 9, "땅", "풀"],
+  ["육파리", 9, "땅", "풀"],
+  ["절벼게", 9, "바위", ""],
+  ["캡싸이", 9, "풀", ""],
+  ["스코빌런", 9, "풀", "불꽃"],
+  ["구르데", 9, "벌레", ""],
+  ["베라카스", 9, "벌레", "에스퍼"],
+  ["하느라기", 9, "에스퍼", ""],
+  ["클레스퍼트라", 9, "에스퍼", ""],
+  ["어리짱", 9, "페어리", "강철"],
+  ["벼리짱", 9, "페어리", "강철"],
+  ["두드리짱", 9, "페어리", "강철"],
+  ["바다그다", 9, "물", ""],
+  ["바닥트리오", 9, "물", ""],
+  ["떨구새", 9, "비행", "악"],
+  ["맨돌핀", 9, "물", ""],
+  ["돌핀맨", 9, "물", ""],
+  ["부르롱", 9, "강철", "독"],
+  ["부르르룸", 9, "강철", "독"],
+  ["모토마", 9, "드래곤", "노말"],
+  ["꿈트렁", 9, "강철", ""],
+  ["초롱순", 9, "바위", "독"],
+  ["킬라플로르", 9, "바위", "독"],
+  ["망망이", 9, "고스트", ""],
+  ["묘두기", 9, "고스트", ""],
+  ["꼬이밍고", 9, "비행", "격투"],
+  ["터벅고래", 9, "얼음", ""],
+  ["우락고래", 9, "얼음", ""],
+  ["가비루사", 9, "물", "에스퍼"],
+  ["어써러셔", 9, "물", ""],
+  ["싸리용", 9, "드래곤", "물"],
+  ["저승갓숭", 9, "격투", "고스트"],
+  ["토오", 9, "독", "땅"],
+  ["키키링", 9, "노말", "에스퍼"],
+  ["노고고치", 9, "노말", ""],
+  ["대도각참", 9, "악", "강철"],
+  ["위대한엄니", 9, "땅", "격투"],
+  ["우렁찬꼬리", 9, "페어리", "에스퍼"],
+  ["사나운버섯", 9, "풀", "악"],
+  ["날개치는머리", 9, "고스트", "페어리"],
+  ["땅을기는날개", 9, "벌레", "격투"],
+  ["모래털가죽", 9, "전기", "땅"],
+  ["무쇠바퀴", 9, "땅", "강철"],
+  ["무쇠보따리", 9, "얼음", "물"],
+  ["무쇠손", 9, "격투", "전기"],
+  ["무쇠머리", 9, "악", "비행"],
+  ["무쇠독나방", 9, "불꽃", "독"],
+  ["무쇠가시", 9, "바위", "전기"],
+  ["드니차", 9, "드래곤", "얼음"],
+  ["드니꽁", 9, "드래곤", "얼음"],
+  ["드닐레이브", 9, "드래곤", "얼음"],
+  ["모으령", 9, "고스트", ""],
+  ["타부자고", 9, "강철", "고스트"],
+  ["총지엔", 9, "악", "풀"],
+  ["파오젠", 9, "악", "얼음"],
+  ["딩루", 9, "악", "땅"],
+  ["위유이", 9, "악", "불꽃"],
+  ["고동치는달", 9, "드래곤", "악"],
+  ["무쇠무인", 9, "페어리", "격투"],
+  ["코라이돈", 9, "격투", "드래곤"],
+  ["미라이돈", 9, "전기", "드래곤"],
+  ["굽이치는물결", 9, "물", "드래곤"],
+  ["무쇠잎새", 9, "풀", "에스퍼"],
+  ["과미르", 9, "풀", "드래곤"],
+  ["차데스", 9, "풀", "고스트"],
+  ["그우린차", 9, "풀", "고스트"],
+  ["조타구", 9, "독", "격투"],
+  ["이야후", 9, "독", "에스퍼"],
+  ["기로치", 9, "독", "페어리"],
+  ["오거폰", 9, "풀", ""],
+  ["브리두라스", 9, "강철", "드래곤"],
+  ["과미드라", 9, "풀", "드래곤"],
+  ["꿰뚫는화염", 9, "불꽃", "드래곤"],
+  ["날뛰는우레", 9, "전기", "드래곤"],
+  ["무쇠암석", 9, "바위", "에스퍼"],
+  ["무쇠감투", 9, "강철", "에스퍼"],
+  ["테라파고스", 9, "노말", ""],
+  ["복숭악동", 9, "독", "고스트"]
+  ]
+};
+
+</script>
+<script>
+/* 포켓몬 한글 따라쓰기 - 학습 데이터 (v4)
+   - pokemon-data.js 의 전국도감 1~1025 를 쓰기 좋은 모양으로 다듬고
+   - 6단계 문제를 그때그때 뽑는 규칙(문제 은행)을 담습니다.
+   - 모든 포켓몬은 어느 단계에서는 꼭 나올 수 있습니다 (1,025마리 전부). */
 window.POKE_DATA = (function () {
   'use strict';
 
-  /* 번호: { 이름, 세대 } — 1~9세대 45마리 (문제·보상으로 모두 만날 수 있어요) */
-  var POKEMON = {
-    /* 1세대 */
-    1:   { name: '이상해씨', gen: 1 },
-    4:   { name: '파이리',   gen: 1 },
-    7:   { name: '꼬부기',   gen: 1 },
-    25:  { name: '피카츄',   gen: 1 },
-    35:  { name: '삐삐',     gen: 1 },
-    39:  { name: '푸린',     gen: 1 },
-    79:  { name: '야돈',     gen: 1 },
-    84:  { name: '두두',     gen: 1 },
-    86:  { name: '쥬쥬',     gen: 1 },
-    133: { name: '이브이',   gen: 1 },
-    143: { name: '잠만보',   gen: 1 },
-    151: { name: '뮤',       gen: 1 },
-    /* 2세대 */
-    152: { name: '치코리타', gen: 2 },
-    175: { name: '토게피',   gen: 2 },
-    183: { name: '마릴',     gen: 2 },
-    197: { name: '블래키',   gen: 2 },
-    /* 3세대 */
-    252: { name: '나무지기', gen: 3 },
-    255: { name: '아차모',   gen: 3 },
-    258: { name: '물짱이',   gen: 3 },
-    282: { name: '가디안',   gen: 3 },
-    /* 4세대 */
-    393: { name: '팽도리',   gen: 4 },
-    431: { name: '나옹마',   gen: 4 },
-    445: { name: '한카리아스', gen: 4 },
-    448: { name: '루카리오', gen: 4 },
-    /* 5세대 */
-    494: { name: '비크티니', gen: 5 },
-    501: { name: '수댕이',   gen: 5 },
-    570: { name: '조로아',   gen: 5 },
-    572: { name: '치라미',   gen: 5 },
-    /* 6세대 */
-    653: { name: '푸호꼬',   gen: 6 },
-    658: { name: '개굴닌자', gen: 6 },
-    700: { name: '님피아',   gen: 6 },
-    702: { name: '데덴네',   gen: 6 },
-    /* 7세대 */
-    722: { name: '나몰빼미', gen: 7 },
-    725: { name: '냐오불',   gen: 7 },
-    728: { name: '누리공',   gen: 7 },
-    778: { name: '따라큐',   gen: 7 },
-    /* 8세대 */
-    810: { name: '흥나숭',   gen: 8 },
-    813: { name: '염버니',   gen: 8 },
-    816: { name: '울머기',   gen: 8 },
-    888: { name: '자시안',   gen: 8 },
-    /* 9세대 */
-    906: { name: '나오하',   gen: 9 },
-    909: { name: '뜨아거',   gen: 9 },
-    912: { name: '꾸왁스',   gen: 9 },
-    921: { name: '빠모',     gen: 9 },
-    1008:{ name: '미라이돈', gen: 9 }
-  };
+  var RAW = window.POKEMON_DATA || { COUNT: 0, LIST: [] };
+  var POKEMON = {};
+  var POKE_IDS = [];
+  (RAW.LIST || []).forEach(function (row, i) {
+    var id = i + 1;
+    POKEMON[id] = {
+      id: id,
+      name: row[0],
+      gen: row[1],
+      types: [row[2]].concat(row[3] ? [row[3]] : [])
+    };
+    POKE_IDS.push(id);
+  });
 
   var GEN_COLORS = {
-    1: '#e8590c', 2: '#2f9e44', 3: '#1971c2', 4: '#c2255c', 5: '#5f3dc4',
-    6: '#0c8599', 7: '#9c36b5', 8: '#b0821a', 9: '#495057'
+    1: '#ff8a5c', 2: '#7bc96f', 3: '#4cc2e0', 4: '#f06fa6', 5: '#9b8bff',
+    6: '#3fc7b4', 7: '#ff9f43', 8: '#8aa4ff', 9: '#c084e8'
+  };
+  var GEN_NAMES = {
+    1: '관동', 2: '성도', 3: '호연', 4: '신오', 5: '하나',
+    6: '칼로스', 7: '알로라', 8: '가라르', 9: '팔데아'
+  };
+
+  var TYPE_COLORS = {
+    '노말': '#b3aea5', '불꽃': '#ff8a4c', '물': '#59b7f2', '전기': '#f7cf3f',
+    '풀': '#68c96a', '얼음': '#79dbe8', '격투': '#e2685c', '독': '#b56bd6',
+    '땅': '#d8ab5c', '비행': '#8fa9f0', '에스퍼': '#f573a9', '벌레': '#a6c23f',
+    '바위': '#c2ad6b', '고스트': '#8374c6', '드래곤': '#6f75e8', '악': '#7e6d63',
+    '강철': '#9fb0c4', '페어리': '#f09ed0'
   };
 
   var ARTWORK = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/';
   var SPRITE = 'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/';
+  /* 포켓몬 울음소리 (PokeAPI cries) */
+  var CRY = 'https://raw.githubusercontent.com/PokeAPI/cries/main/cries/pokemon/latest/';
+  var CRY_ALT = 'https://cdn.jsdelivr.net/gh/PokeAPI/cries@main/cries/pokemon/latest/';
 
-  function artworkUrl(id) { return ARTWORK + id + '.png'; }
-  function spriteUrl(id) { return SPRITE + id + '.png'; }
+  function artworkUrl(id) { return ARTWORK + Number(id) + '.png'; }
+  function spriteUrl(id) { return SPRITE + Number(id) + '.png'; }
+  function cryUrl(id) { return CRY + Number(id) + '.ogg'; }
+  function cryAltUrl(id) { return CRY_ALT + Number(id) + '.ogg'; }
+
   function genOf(id) { var p = POKEMON[id]; return p ? p.gen : 1; }
   function genLabel(id) { return genOf(id) + '세대'; }
+  function nameOf(id) { var p = POKEMON[id]; return p ? p.name : ''; }
+  function lenOf(id) { return nameOf(id).length; }
+  function typeColor(t) { return TYPE_COLORS[t] || '#b3aea5'; }
 
-  /* 단계를 깰 때 잡는 포켓몬 (1~8세대) */
+  /* 세대별 마리 수 */
+  var GEN_COUNT = {};
+  POKE_IDS.forEach(function (id) {
+    var g = genOf(id);
+    GEN_COUNT[g] = (GEN_COUNT[g] || 0) + 1;
+  });
+
+  /* 단계를 깰 때 잡는 포켓몬 */
   var REWARDS = { 1: 175, 2: 197, 3: 252, 4: 282, 5: 393, 6: 888 };
   /* 모든 단계를 깨면 찾아오는 전설의 포켓몬 */
   var BONUS = 151;
 
   /*
-    문제 = { id: 포켓몬 번호, trace: 써 볼 글자 위치(0부터) }
-    trace에 없는 글자는 미리 채워진 글자로 보여 준다.
-    guide: strong(진한 회색) / faint(아주 연한 흐린 글자) / blank(가이드 없는 백지)
+    문제는 고정 목록이 아니라 단계 규칙(pool)으로 그때그때 뽑습니다.
+    pool(id) 이 true 인 포켓몬이 그 단계에 나올 수 있습니다.
+      - 1단계: 이름이 두 글자 이상 → 첫 글자 한 글자 따라 쓰기
+      - 2단계: 한두 글자 이름 → 이름 전체
+      - 3단계: 세 글자 이름 → 이름 전체
+      - 4단계: 세·네 글자 이름 → 흐린 글자 전체
+      - 5단계: 세 글자 이상 이름 → 빠진 한 글자 혼자 쓰기
+      - 6단계: 두세 글자 이름 → 이름 전체 혼자 쓰기 (백지)
   */
   var STAGES = [
     {
@@ -1050,133 +2352,183 @@ window.POKE_DATA = (function () {
       title: '첫 글자 따라 쓰기',
       subtitle: '이름의 첫 글자 한 글자',
       icon: '✏️',
-      theme: '#ff8fab',
+      theme: '#ff9ec4',
+      theme2: '#ffd6e7',
       guide: 'strong',
       tip: '포켓몬 이름의 첫 글자를 손가락으로 따라 써요',
-      hint: '회색 글자 위를 손가락으로 따라 그어요',
-      questions: [
-        { id: 25,   trace: [0] },   /* 피카츄 → 피 */
-        { id: 7,    trace: [0] },   /* 꼬부기 → 꼬 */
-        { id: 906,  trace: [0] },   /* 나오하 → 나 */
-        { id: 921,  trace: [0] },   /* 빠모 → 빠 */
-        { id: 152,  trace: [0] },   /* 치코리타 → 치 */
-        { id: 909,  trace: [0] }    /* 뜨아거 → 뜨 */
-      ]
+      count: 6,
+      blank: false,
+      pool: function (p) { return p.name.length >= 2; },
+      trace: function (p) { return [0]; }
     },
     {
       id: 2,
-      title: '두 글자 따라 쓰기',
-      subtitle: '짧은 이름을 통째로',
+      title: '짧은 이름 따라 쓰기',
+      subtitle: '한두 글자 이름을 통째로',
       icon: '🙌',
-      theme: '#4dabf7',
+      theme: '#79c9ff',
+      theme2: '#cdeeff',
       guide: 'strong',
-      tip: '두 글자 이름을 처음부터 끝까지 따라 써요',
-      hint: '한 글자씩 차례대로 따라 써요',
-      questions: [
-        { id: 183, trace: [0, 1] },   /* 마릴 */
-        { id: 921, trace: [0, 1] },   /* 빠모 */
-        { id: 39,  trace: [0, 1] },   /* 푸린 */
-        { id: 79,  trace: [0, 1] },   /* 야돈 */
-        { id: 84,  trace: [0, 1] },   /* 두두 */
-        { id: 35,  trace: [0, 1] },   /* 삐삐 */
-        { id: 86,  trace: [0, 1] }    /* 쥬쥬 */
-      ]
+      tip: '짧은 이름을 처음부터 끝까지 따라 써요',
+      count: 6,
+      blank: false,
+      pool: function (p) { return p.name.length <= 2; },
+      trace: function (p) { return range(p.name.length); }
     },
     {
       id: 3,
       title: '세 글자 따라 쓰기',
       subtitle: '세 글자 이름 전체',
       icon: '💪',
-      theme: '#f59f00',
+      theme: '#ffc247',
+      theme2: '#ffe9b8',
       guide: 'strong',
-      tip: '세 글자 이름을 순서대로 다 따라 써요',
-      hint: '세 글자를 차례대로 따라 써요',
-      questions: [
-        { id: 4,   trace: [0, 1, 2] },   /* 파이리 */
-        { id: 255, trace: [0, 1, 2] },   /* 아차모 */
-        { id: 501, trace: [0, 1, 2] },   /* 수댕이 */
-        { id: 653, trace: [0, 1, 2] },   /* 푸호꼬 */
-        { id: 912, trace: [0, 1, 2] },   /* 꾸왁스 */
-        { id: 816, trace: [0, 1, 2] }    /* 울머기 */
-      ]
+      tip: '세 글자를 차례대로 다 따라 써요',
+      count: 6,
+      blank: false,
+      pool: function (p) { return p.name.length === 3; },
+      trace: function (p) { return range(p.name.length); }
     },
     {
       id: 4,
       title: '흐린 글자 따라 쓰기',
       subtitle: '아주 연한 글자를 보고 따라 쓰기',
       icon: '🌫️',
-      theme: '#845ef7',
+      theme: '#a98bff',
+      theme2: '#e3d9ff',
       guide: 'faint',
       tip: '아주 연한 글자를 눈으로 보고 따라 써요',
-      hint: '흐린 글자 모양을 잘 보고 따라 그어요',
-      questions: [
-        { id: 133, trace: [0, 1, 2] },   /* 이브이 */
-        { id: 570, trace: [0, 1, 2] },   /* 조로아 */
-        { id: 572, trace: [0, 1, 2] },   /* 치라미 */
-        { id: 258, trace: [0, 1, 2] },   /* 물짱이 */
-        { id: 700, trace: [0, 1, 2] },   /* 님피아 */
-        { id: 702, trace: [0, 1, 2] }    /* 데덴네 */
-      ]
+      count: 5,
+      blank: false,
+      pool: function (p) { return p.name.length === 3 || p.name.length === 4; },
+      trace: function (p) { return range(p.name.length); }
     },
     {
       id: 5,
       title: '빈칸 혼자 쓰기',
       subtitle: '이름에서 빠진 한 글자를 혼자서',
       icon: '🧩',
-      theme: '#20c997',
+      theme: '#4fd0a8',
+      theme2: '#c9f5e6',
       guide: 'blank',
       tip: '빈칸 글자를 혼자 써 봐요',
-      hint: '빈칸 글자를 혼자 써 봐요. 막히면 살짝 힌트!',
-      questions: [
-        { id: 1,    trace: [3] },   /* 이상해[씨] */
-        { id: 445,  trace: [4] },   /* 한카리아[스] */
-        { id: 658,  trace: [3] },   /* 개굴닌[자] */
-        { id: 722,  trace: [3] },   /* 나몰빼[미] */
-        { id: 778,  trace: [2] },   /* 따라[큐] */
-        { id: 431,  trace: [2] },   /* 나옹[마] */
-        { id: 494,  trace: [3] }    /* 비크티[니] */
-      ]
+      count: 5,
+      blank: true,
+      pool: function (p) { return p.name.length >= 3; },
+      trace: function (p, rand) {
+        /* 첫 글자는 보여 주고, 뒤에서 한 글자를 가린다 */
+        var i = 1 + Math.floor((rand ? rand() : Math.random()) * (p.name.length - 1));
+        return [Math.min(p.name.length - 1, i)];
+      }
     },
     {
       id: 6,
       title: '이름 전체 혼자 쓰기!',
       subtitle: '가이드 없이 이름을 통째로',
       icon: '🏆',
-      theme: '#e64980',
+      theme: '#ff7ba9',
+      theme2: '#ffd9e6',
       guide: 'blank',
       tip: '이름 전체를 혼자 써 봐요',
-      hint: '이름을 통째로 혼자 써 봐요. 막히면 살짝 힌트!',
-      questions: [
-        { id: 813,  trace: [0, 1, 2] },       /* 염버니 */
-        { id: 143,  trace: [0, 1, 2] },       /* 잠만보 */
-        { id: 725,  trace: [0, 1, 2] },       /* 냐오불 */
-        { id: 810,  trace: [0, 1, 2] },       /* 흥나숭 */
-        { id: 728,  trace: [0, 1, 2] },       /* 누리공 */
-        { id: 448,  trace: [0, 1, 2, 3] },    /* 루카리오 */
-        { id: 1008, trace: [0, 1, 2, 3] }     /* 미라이돈 */
-      ]
+      count: 4,
+      blank: true,
+      pool: function (p) { return p.name.length >= 2 && p.name.length <= 3; },
+      trace: function (p) { return range(p.name.length); }
     }
   ];
 
+  function range(n) {
+    var out = [];
+    for (var i = 0; i < n; i++) out.push(i);
+    return out;
+  }
+
+  /* 단계에 나올 수 있는 포켓몬 (세대 고르기: 0 = 전체) */
+  function stagePool(sid, gen) {
+    var s = STAGES.filter(function (x) { return x.id === sid; })[0];
+    if (!s) return [];
+    return POKE_IDS.filter(function (id) {
+      var p = POKEMON[id];
+      if (gen && p.gen !== gen) return false;
+      return s.pool(p);
+    });
+  }
+
+  /* 그 세대에 그 단계로 나올 수 있는 포켓몬이 있는지 (없으면 전체로 돌아간다) */
+  function stageAvailable(sid, gen) {
+    return gen ? stagePool(sid, gen).length > 0 : true;
+  }
+
+  function shuffle(arr, rand) {
+    var r = rand || Math.random;
+    for (var i = arr.length - 1; i > 0; i--) {
+      var j = Math.floor(r() * (i + 1));
+      var t = arr[i]; arr[i] = arr[j]; arr[j] = t;
+    }
+    return arr;
+  }
+
+  /*
+    단계 문제 n개를 뽑는다.
+    - 이미 잡은 포켓몬보다 아직 못 만난 포켓몬을 먼저 넣어 도감이 골고루 채워지게 한다
+    - 같은 단계 안에서 같은 포켓몬이 두 번 나오지 않는다
+  */
+  function makeQuestions(sid, gen, n, isCaught, rand) {
+    var s = STAGES.filter(function (x) { return x.id === sid; })[0];
+    if (!s) return [];
+    var r = rand || Math.random;
+    var pool = stagePool(sid, gen);
+    var fresh = [];
+    var seen = [];
+    shuffle(pool.slice(), r).forEach(function (id) {
+      if (typeof isCaught === 'function' && isCaught(id)) seen.push(id);
+      else fresh.push(id);
+    });
+    var list = fresh.concat(seen);
+    var want = Math.min(n || s.count, list.length);
+    var out = [];
+    for (var i = 0; i < want; i++) {
+      var p = POKEMON[list[i]];
+      out.push({ id: list[i], trace: s.trace(p, r) });
+    }
+    return out;
+  }
+
   return {
     POKEMON: POKEMON,
+    POKE_IDS: POKE_IDS,
+    COUNT: POKE_IDS.length,
     STAGES: STAGES,
     REWARDS: REWARDS,
     BONUS: BONUS,
     GEN_COLORS: GEN_COLORS,
+    GEN_NAMES: GEN_NAMES,
+    GEN_COUNT: GEN_COUNT,
+    TYPE_COLORS: TYPE_COLORS,
     artworkUrl: artworkUrl,
     spriteUrl: spriteUrl,
+    cryUrl: cryUrl,
+    cryAltUrl: cryAltUrl,
     genOf: genOf,
-    genLabel: genLabel
+    genLabel: genLabel,
+    nameOf: nameOf,
+    lenOf: lenOf,
+    typeColor: typeColor,
+    stagePool: stagePool,
+    stageAvailable: stageAvailable,
+    makeQuestions: makeQuestions,
+    shuffle: shuffle
   };
 })();
 
 </script>
 <script>
-/* 포켓몬 한글 따라쓰기 - 메인 로직 (v3)
+/* 포켓몬 한글 따라쓰기 - 메인 로직 (v4)
+   - 전국도감 1~1025 (1~9세대) 전체
    - 글자를 다 쓰면 저절로 정답 처리 (손을 뗀 뒤 잠깐 기다렸다가 검사)
    - 정밀 인식: 글자 덮음 + 3x3 구역 검사 + 글자 밖 벗어남 검사
-   - 6단계: 진한 가이드 → 흐린 가이드 → 백지 혼자 쓰기 */
+   - 6단계: 진한 가이드 → 흐린 가이드 → 백지 혼자 쓰기
+   - 포획할 때 포켓몬 울음소리 재생 (실패하면 한국어 목소리로 대신) */
 (function () {
   'use strict';
 
@@ -1186,20 +2538,27 @@ window.POKE_DATA = (function () {
   var REWARDS = D.REWARDS;
   var BONUS = D.BONUS;
   var GEN_COLORS = D.GEN_COLORS;
+  var GEN_NAMES = D.GEN_NAMES;
   var artworkUrl = D.artworkUrl;
   var spriteUrl = D.spriteUrl;
+  var cryUrl = D.cryUrl;
+  var cryAltUrl = D.cryAltUrl;
   var genOf = D.genOf;
   var genLabel = D.genLabel;
+  var typeColor = D.typeColor;
+  var makeQuestions = D.makeQuestions;
+  var stagePool = D.stagePool;
 
-  var KEY = 'pokemon-hangul-trace-v3';
+  var KEY = 'pokemon-hangul-v4';
+  var OLD_KEYS = ['pokemon-hangul-trace-v3'];
   var main = document.getElementById('main');
   var hud = document.getElementById('hud');
   var confettiLayer = document.getElementById('confetti-layer');
   var toastEl = document.getElementById('toast');
 
-  var POKE_IDS = Object.keys(POKEMON).map(Number).sort(function (a, b) { return a - b; });
+  var POKE_IDS = D.POKE_IDS;
   var PRAISE = ['좋았어!', '잘했어!', '최고야!', '멋져!', '딱 좋아!', '짝짝짝!'];
-  var INK_COLORS = ['#ff6b9d', '#4dabf7', '#845ef7', '#f76707', '#20c997', '#e64980'];
+  var INK_COLORS = ['#ff7ba9', '#4db8ff', '#a98bff', '#ffa94d', '#37c9a3', '#ff6b6b'];
 
   /* 정밀 인식 기준 (단계별) */
   var RECOG = {
@@ -1215,22 +2574,32 @@ window.POKE_DATA = (function () {
 
   /* ---------------- 상태 저장 ---------------- */
   function defaultState() {
-    return { unlocked: 1, cleared: {}, caught: [], muted: false };
+    return { unlocked: 1, cleared: {}, caught: [], muted: false, gen: 0 };
   }
   var state = defaultState();
 
+  function validId(id) { return !!POKEMON[Number(id)]; }
+
   function loadState() {
+    var raw = null;
+    try { raw = localStorage.getItem(KEY); } catch (e) {}
+    if (!raw) {
+      /* v3 기록이 있으면 잡은 포켓몬·별·잠금 해제를 이어받는다 */
+      for (var i = 0; i < OLD_KEYS.length && !raw; i++) {
+        try { raw = localStorage.getItem(OLD_KEYS[i]); } catch (e) { raw = null; }
+      }
+    }
+    if (!raw) return;
     try {
-      var raw = localStorage.getItem(KEY);
-      if (!raw) return;
       var s = JSON.parse(raw);
       if (!s || typeof s !== 'object') return;
       state = Object.assign(defaultState(), s);
       if (!Array.isArray(state.caught)) state.caught = [];
-      /* 예전 판에서 잡은 포켓몬 중 지금 도감에 없는 번호는 정리한다 */
-      state.caught = state.caught.map(Number).filter(function (id) { return !!POKEMON[id]; });
+      state.caught = state.caught.map(Number).filter(validId);
       if (!state.cleared || typeof state.cleared !== 'object') state.cleared = {};
       state.unlocked = Math.min(STAGES.length, Math.max(1, Number(state.unlocked) || 1));
+      state.gen = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9].indexOf(Number(state.gen)) !== -1 ? Number(state.gen) : 0;
+      state.muted = !!state.muted;
     } catch (e) {
       state = defaultState();
     }
@@ -1241,13 +2610,18 @@ window.POKE_DATA = (function () {
   function isCaught(id) { return state.caught.indexOf(Number(id)) !== -1; }
   function catchPokemon(id) {
     id = Number(id);
-    if (isCaught(id)) return false;
+    if (!validId(id) || isCaught(id)) return false;
     state.caught.push(id);
     saveState();
     return true;
   }
   function clearedCount() { return Object.keys(state.cleared).length; }
-  function caughtCount() { return POKE_IDS.filter(isCaught).length; }
+  function caughtCount() { return state.caught.length; }
+  function caughtOf(ids) {
+    var n = 0;
+    ids.forEach(function (id) { if (isCaught(id)) n++; });
+    return n;
+  }
   function totalStars() {
     var t = 0;
     Object.keys(state.cleared).forEach(function (k) { t += Number(state.cleared[k]) || 0; });
@@ -1257,7 +2631,7 @@ window.POKE_DATA = (function () {
     return STAGES.every(function (s) { return state.cleared[s.id] > 0; });
   }
 
-  /* ---------------- 소리 ---------------- */
+  /* ---------------- 효과음 ---------------- */
   var Sound = {
     ctx: null,
     ensure: function () {
@@ -1302,24 +2676,24 @@ window.POKE_DATA = (function () {
       osc.connect(gain); gain.connect(ctx.destination);
       osc.start(t0); osc.stop(t0 + dur + 0.05);
     },
-    tap: function () { this.tone(880, 0, 0.07, 'sine', 0.06); },
+    tap: function () { this.tone(980, 0, 0.06, 'sine', 0.05); },
     correct: function () {
-      var notes = [523.25, 659.25, 783.99, 1046.5];
-      for (var i = 0; i < notes.length; i++) this.tone(notes[i], i * 0.07, 0.2, 'sine', 0.15);
+      var notes = [659.25, 783.99, 987.77, 1318.5];
+      for (var i = 0; i < notes.length; i++) this.tone(notes[i], i * 0.07, 0.18, 'sine', 0.13);
     },
-    pop: function () { this.slide(500, 1200, 0, 0.14, 0.13); },
-    nudge: function () { this.slide(420, 560, 0, 0.2, 0.1); },
+    pop: function () { this.slide(520, 1300, 0, 0.13, 0.12); },
+    nudge: function () { this.slide(420, 560, 0, 0.2, 0.09); },
     fanfare: function () {
       var seq = [[523.25, 0], [659.25, 0.12], [783.99, 0.24], [1046.5, 0.36], [783.99, 0.52], [1046.5, 0.62], [1318.5, 0.74]];
-      for (var i = 0; i < seq.length; i++) this.tone(seq[i][0], seq[i][1], 0.3, 'triangle', 0.13);
-      this.tone(261.63, 0, 0.9, 'sine', 0.07);
-      this.tone(392.0, 0, 0.9, 'sine', 0.05);
+      for (var i = 0; i < seq.length; i++) this.tone(seq[i][0], seq[i][1], 0.28, 'triangle', 0.11);
+      this.tone(261.63, 0, 0.9, 'sine', 0.06);
     }
   };
 
   /* ---------------- 말하기(TTS) ---------------- */
   var Speech = {
     voice: null,
+    last: null,
     init: function () {
       if (!('speechSynthesis' in window)) return;
       var self = this;
@@ -1340,6 +2714,7 @@ window.POKE_DATA = (function () {
     },
     speak: function (text, opts) {
       if (state.muted || !text || !('speechSynthesis' in window)) return;
+      this.last = String(text);
       var self = this;
       var go = function () {
         try {
@@ -1347,7 +2722,7 @@ window.POKE_DATA = (function () {
           u.lang = 'ko-KR';
           if (self.voice) u.voice = self.voice;
           u.rate = (opts && opts.rate) || 0.88;
-          u.pitch = 1.15;
+          u.pitch = 1.18;
           u.volume = 1;
           window.speechSynthesis.speak(u);
         } catch (e) {}
@@ -1366,8 +2741,82 @@ window.POKE_DATA = (function () {
     }
   };
 
+  /* ---------------- 포켓몬 울음소리 ---------------- */
+  var Cry = {
+    els: {},
+    order: [],
+    last: null,
+    forceFail: false,
+    make: function (url) {
+      var a = new Audio();
+      a.preload = 'auto';
+      a.volume = 0.9;
+      a.src = url;
+      return a;
+    },
+    get: function (id) {
+      id = Number(id);
+      var e = this.els[id];
+      if (!e) {
+        e = { main: this.make(cryUrl(id)), alt: null };
+        this.els[id] = e;
+        this.order.push(id);
+        while (this.order.length > 6) {
+          var old = this.order.shift();
+          if (old === id) continue;
+          try { this.els[old].main.src = ''; } catch (err) {}
+          delete this.els[old];
+        }
+      }
+      return e;
+    },
+    /* 다음에 들을 울음소리를 미리 받아 둔다 */
+    preload: function (id) {
+      if (state.muted || !validId(id)) return;
+      try { this.get(id).main.load(); } catch (err) {}
+    },
+    tryPlay: function (el, done) {
+      var settled = false;
+      var finish = function (ok) {
+        if (settled) return;
+        settled = true;
+        el.onerror = null;
+        done(ok);
+      };
+      el.onerror = function () { finish(false); };
+      try {
+        el.currentTime = 0;
+        var p = el.play();
+        if (p && p.then) {
+          p.then(function () { finish(true); }, function () { finish(false); });
+        }
+        setTimeout(function () { if (!settled && !el.paused) finish(true); }, 700);
+      } catch (err) { finish(false); }
+    },
+    /* cb('ok' | 'fail' | 'muted') */
+    play: function (id, cb) {
+      var self = this;
+      id = Number(id);
+      self.last = { id: id, url: cryUrl(id), status: 'start' };
+      var done = function (status) {
+        self.last.status = status;
+        if (cb) cb(status);
+      };
+      if (!validId(id)) { done('fail'); return; }
+      if (state.muted) { done('muted'); return; }
+      if (self.forceFail) { done('fail'); return; }
+      var e = self.get(id);
+      self.tryPlay(e.main, function (ok) {
+        if (ok) { done('ok'); return; }
+        /* 다른 주소에서 한 번 더 (네트워크·형식 문제 대비) */
+        if (!e.alt) e.alt = self.make(cryAltUrl(id));
+        self.tryPlay(e.alt, function (ok2) { done(ok2 ? 'ok' : 'fail'); });
+      });
+    }
+  };
+
   /* ---------------- 효과 ---------------- */
-  var COLORS = ['#ff6b6b', '#ffd93d', '#6bcb77', '#4d96ff', '#b983ff', '#ff9f43', '#ff8fab'];
+  var COLORS = ['#ff8fb1', '#ffd166', '#7ee0a8', '#7cc7ff', '#c2a4ff', '#ffb27f', '#ff9ec4'];
 
   function confetti(n, origin) {
     n = n || 26;
@@ -1380,13 +2829,14 @@ window.POKE_DATA = (function () {
       p.style.left = x + 'px';
       p.style.top = y + 'px';
       p.style.background = COLORS[i % COLORS.length];
-      p.style.setProperty('--dx', (Math.random() * 2 - 1) * (w * 0.32) + 'px');
+      p.style.setProperty('--dx', (Math.random() * 2 - 1) * (w * 0.34) + 'px');
       p.style.setProperty('--dy', (Math.random() * 0.5 + 0.9) * (h * 0.45) + 'px');
       p.style.setProperty('--rot', Math.round(Math.random() * 900 - 450) + 'deg');
       p.style.setProperty('--dur', (1.1 + Math.random() * 0.9).toFixed(2) + 's');
       p.style.animationDelay = (Math.random() * 0.15).toFixed(2) + 's';
+      if (i % 3 === 0) p.style.borderRadius = '50%';
       confettiLayer.appendChild(p);
-      (function (node) { setTimeout(function () { node.remove(); }, 2600); })(p);
+      (function (node) { setTimeout(function () { node.remove(); }, 2800); })(p);
     }
   }
 
@@ -1410,17 +2860,18 @@ window.POKE_DATA = (function () {
 
   var PLACEHOLDER = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120">' +
-    '<circle cx="60" cy="60" r="52" fill="#f5f7fb" stroke="#c9d6e8" stroke-width="6"/>' +
-    '<path d="M8 60a52 52 0 0 1 104 0z" fill="#ff7b7b"/>' +
-    '<rect x="8" y="55" width="104" height="10" fill="#39445c"/>' +
-    '<circle cx="60" cy="60" r="16" fill="#fff" stroke="#39445c" stroke-width="8"/>' +
+    '<circle cx="60" cy="60" r="52" fill="#fff4f8" stroke="#ffd0e2" stroke-width="6"/>' +
+    '<path d="M8 60a52 52 0 0 1 104 0z" fill="#ff9ec4"/>' +
+    '<rect x="8" y="55" width="104" height="10" fill="#6b5a72"/>' +
+    '<circle cx="60" cy="60" r="16" fill="#fff" stroke="#6b5a72" stroke-width="8"/>' +
     '</svg>'
   );
 
   window.__pokeImgFallback = function (img) {
     var step = Number(img.getAttribute('data-step') || 0);
     var id = img.getAttribute('data-id');
-    if (step === 0) {
+    var spriteOnly = img.getAttribute('data-sprite') === '1';
+    if (step === 0 && !spriteOnly) {
       img.setAttribute('data-step', '1');
       img.src = spriteUrl(id);
     } else {
@@ -1430,15 +2881,18 @@ window.POKE_DATA = (function () {
     }
   };
 
-  function pokeImg(id, cls, alt) {
-    return '<img class="' + (cls || '') + '" data-id="' + id + '" data-step="0" ' +
-      'src="' + artworkUrl(id) + '" alt="' + (alt || POKEMON[id].name) + '" ' +
-      'loading="lazy" decoding="async" onerror="window.__pokeImgFallback(this)">';
+  function pokeImg(id, cls, opts) {
+    opts = opts || {};
+    var sprite = !!opts.sprite;
+    var alt = opts.alt || (POKEMON[id] ? POKEMON[id].name : '포켓몬');
+    return '<img class="' + (cls || '') + '" data-id="' + id + '" data-step="0" data-sprite="' + (sprite ? '1' : '0') + '" ' +
+      'src="' + (sprite ? spriteUrl(id) : artworkUrl(id)) + '" alt="' + alt + '" ' +
+      'loading="lazy" decoding="async" draggable="false" onerror="window.__pokeImgFallback(this)">';
   }
 
   function genBadge(id, extraCls) {
     return '<span class="gen-badge' + (extraCls ? ' ' + extraCls : '') + '" style="--gen:' +
-      (GEN_COLORS[genOf(id)] || '#495057') + '">' + genLabel(id) + '</span>';
+      (GEN_COLORS[genOf(id)] || '#9b8bff') + '">' + genLabel(id) + '</span>';
   }
 
   function starRow(n, max) {
@@ -1460,10 +2914,10 @@ window.POKE_DATA = (function () {
 
   /* ---------------- 화면 공통 ---------------- */
   var view = 'home';
-  var stage = null;   /* { data, index, hints, clears } */
+  var stage = null;   /* { data, questions, index, hints, clears } */
   var T = null;       /* 따라쓰기 세션 */
   var tokenSeq = 0;
-  var dexFilter = 0;
+  var dexState = { gen: 0, q: '', shown: 0, list: [] };
 
   function setHud(title) {
     if (!title) { hud.hidden = true; hud.innerHTML = ''; return; }
@@ -1486,39 +2940,56 @@ window.POKE_DATA = (function () {
     cancelTimers();
     T = null;
     Speech.stop();
+    try { Object.keys(Cry.els).forEach(function (k) { Cry.els[k].main.pause(); }); } catch (e) {}
     var ov = document.getElementById('catch-overlay');
     if (ov) ov.remove();
+    var md = document.getElementById('dex-detail');
+    if (md) md.remove();
   }
 
   /* ---------------- 홈 ---------------- */
+  var HEROES = [[25, 133, 1008], [1, 4, 7], [906, 909, 912], [39, 183, 700], [151, 251, 385], [448, 658, 778], [175, 187, 209], [152, 255, 258]];
+
   function goHome() {
     hideToast();
     view = 'home';
     stage = null;
     endTrace();
     setHud(null);
+    var trio = HEROES[Math.floor(Math.random() * HEROES.length)];
     var started = clearedCount() > 0 || state.unlocked > 1;
     main.innerHTML =
       '<section class="screen home-screen">' +
-      '<div class="home-sky"></div>' +
+      '<div class="home-bubbles" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>' +
       '<div class="home-cloud c1"></div><div class="home-cloud c2"></div><div class="home-cloud c3"></div>' +
       '<div class="home-inner">' +
-      '<div class="home-badge">1~9세대 · ' + POKE_IDS.length + '마리 · 5살</div>' +
-      '<h1 class="home-title">포켓몬<br>한글 따라쓰기</h1>' +
+      '<div class="home-badge">전국도감 <b>' + D.COUNT + '</b>마리 · 1~9세대</div>' +
+      '<h1 class="home-title"><span>포켓몬</span><span>한글</span><span>따라쓰기</span></h1>' +
       '<div class="home-hero">' +
-      '<div class="hero-poke mini">' + pokeImg(906, 'hero-img') + '</div>' +
-      '<div class="hero-poke big">' + pokeImg(25, 'hero-img') + '</div>' +
-      '<div class="hero-poke mini">' + pokeImg(1008, 'hero-img') + '</div>' +
+      '<div class="hero-poke mini">' + pokeImg(trio[0], 'hero-img') + '</div>' +
+      '<div class="hero-poke big">' + pokeImg(trio[1], 'hero-img') + '</div>' +
+      '<div class="hero-poke mini">' + pokeImg(trio[2], 'hero-img') + '</div>' +
+      '<div class="hero-ball" aria-hidden="true"><i></i><b></b></div>' +
       '</div>' +
       '<p class="home-sub">포켓몬 이름을 손가락으로 써 봐요!</p>' +
       '<button class="big-btn primary" data-act="start">' + (started ? '계속 하기' : '시작하기') + '</button>' +
       '<div class="home-links">' +
-      '<button class="ghost-btn" data-act="dex">📕 나의 도감 (' + caughtCount() + ')</button>' +
+      '<button class="ghost-btn" data-act="dex">📕 도감 <b>' + caughtCount() + '</b></button>' +
       '<button class="ghost-btn" data-act="parent">👨‍👩‍👧 보호자</button>' +
       '</div>' +
       '</div>' +
-      '<div class="home-grass"></div>' +
       '</section>';
+  }
+
+  /* ---------------- 세대 고르기 ---------------- */
+  function genPickerHTML() {
+    var html = '<div class="gen-picker" role="group" aria-label="세대 고르기">' +
+      '<button class="gen-chip' + (!state.gen ? ' on' : '') + '" data-act="pick-gen" data-gen="0">전체 ' + D.COUNT + '</button>';
+    for (var g = 1; g <= 9; g++) {
+      html += '<button class="gen-chip' + (state.gen === g ? ' on' : '') + '" data-act="pick-gen" data-gen="' + g + '" ' +
+        'style="--gen:' + (GEN_COLORS[g] || '#9b8bff') + '">' + g + '세대<em>' + GEN_NAMES[g] + '</em></button>';
+    }
+    return html + '</div>';
   }
 
   /* ---------------- 지도 ---------------- */
@@ -1529,25 +3000,29 @@ window.POKE_DATA = (function () {
     endTrace();
     setHud('모험 지도');
     var done = clearedCount();
+    var genIds = state.gen ? POKE_IDS.filter(function (id) { return genOf(id) === state.gen; }) : POKE_IDS;
     var html = '<section class="screen map-screen">';
     html += '<div class="map-top">' +
       '<div class="map-progress"><span>진행한 단계 <b>' + done + '</b> / ' + STAGES.length + '</span>' +
       '<div class="map-bar"><i style="width:' + (done / STAGES.length * 100) + '%"></i></div></div>' +
-      '<button class="dex-btn" data-act="dex">📕 도감</button>' +
+      '<button class="dex-btn" data-act="dex">📕 도감<br><b>' + caughtCount() + '</b></button>' +
       '</div>';
+    html += '<div class="gen-pick"><div class="gen-pick-title">어느 세대 포켓몬과 놀까요?</div>' + genPickerHTML() + '</div>';
     html += '<div class="stage-list">';
     STAGES.forEach(function (s) {
       var locked = s.id > state.unlocked;
       var stars = state.cleared[s.id] || 0;
       var cleared = stars > 0;
+      var pool = stagePool(s.id, state.gen).length;
       html += '<button class="stage-card' + (locked ? ' locked' : '') + (cleared ? ' cleared' : '') +
         '" data-act="stage" data-id="' + s.id + '" data-locked="' + (locked ? '1' : '0') + '" ' +
-        'style="--theme:' + s.theme + '">' +
+        'style="--theme:' + s.theme + ';--theme2:' + s.theme2 + '">' +
         '<span class="sc-num">' + (locked ? '🔒' : (cleared ? '✓' : s.id)) + '</span>' +
         '<span class="sc-body">' +
         '<span class="sc-title">' + (locked ? '아직 잠겨 있어요' : s.id + '단계 · ' + s.title) + '</span>' +
         '<span class="sc-sub">' + (locked ? s.id + '단계를 먼저 깨야 해요' : s.subtitle) + '</span>' +
-        '<span class="sc-stars">' + starRow(stars) + '</span>' +
+        '<span class="sc-meta"><span class="sc-stars">' + starRow(stars) + '</span>' +
+        (locked ? '' : '<span class="sc-pool">' + pool + '마리 중 ' + s.count + '마리</span>') + '</span>' +
         '</span>' +
         '<span class="sc-icon">' + (locked ? '🚪' : s.icon) + '</span>' +
         '</button>';
@@ -1561,8 +3036,10 @@ window.POKE_DATA = (function () {
     }
     html += '<div class="map-links"><button class="ghost-btn" data-act="home">처음으로</button>' +
       '<button class="ghost-btn" data-act="parent">👨‍👩‍👧 보호자</button></div>';
+    html += '<div class="map-dex-note">도감 <b>' + caughtCount() + '</b> / ' + D.COUNT + '마리 · 잡은 포켓몬은 도감에 쌓여요</div>';
     html += '</section>';
     main.innerHTML = html;
+    main.scrollTop = 0;
   }
 
   /* ---------------- 단계 시작 ---------------- */
@@ -1575,8 +3052,19 @@ window.POKE_DATA = (function () {
       toast('아직 잠겨 있어요! 앞 단계를 먼저 깨요 🔒');
       return;
     }
+    var pool = stagePool(id, state.gen);
+    if (!pool.length) {
+      toast('이 세대에는 이 단계 포켓몬이 없어요. 세대를 바꿔 볼까요?');
+      return;
+    }
     hideToast();
-    stage = { data: s, index: 0, hints: 0, clears: 0 };
+    stage = {
+      data: s,
+      questions: makeQuestions(id, state.gen, s.count, isCaught),
+      index: 0,
+      hints: 0,
+      clears: 0
+    };
     view = 'quiz';
     renderQuestion();
   }
@@ -1591,7 +3079,7 @@ window.POKE_DATA = (function () {
   }
 
   function nameRowClass(n) {
-    return n >= 5 ? ' len5' : (n === 4 ? ' len4' : (n === 3 ? ' len3' : ''));
+    return n >= 6 ? ' len6' : (n === 5 ? ' len5' : (n === 4 ? ' len4' : (n === 3 ? ' len3' : (n === 2 ? ' len2' : ''))));
   }
 
   function nameRowHTML(chars, targets, doneCount) {
@@ -1616,26 +3104,30 @@ window.POKE_DATA = (function () {
   function renderQuestion() {
     hideToast();
     var s = stage.data;
-    var q = s.questions[stage.index];
+    var q = stage.questions[stage.index];
+    if (!q) { finishStage(); return; }
     var pkm = POKEMON[q.id];
     var chars = pkm.name.split('');
     var targets = traceTargets(q);
-    var total = s.questions.length;
+    var total = stage.questions.length;
     var blank = s.guide === 'blank';
 
     setHud(s.title);
-    document.getElementById('hud').style.setProperty('--theme', s.theme);
+    hud.style.setProperty('--theme', s.theme);
 
     main.innerHTML =
-      '<section class="screen trace-screen" style="--theme:' + s.theme + '">' +
+      '<section class="screen trace-screen" style="--theme:' + s.theme + ';--theme2:' + s.theme2 + '">' +
       '<div class="q-top">' +
-      '<div class="q-step">' + s.icon + ' ' + s.id + '단계</div>' +
-      '<div class="q-count">' + (stage.index + 1) + ' / ' + total + '</div>' +
-      '</div>' +
+      '<span class="q-step">' + s.icon + ' ' + s.id + '단계</span>' +
       '<div class="q-bar"><i style="width:' + (stage.index / total * 100) + '%"></i></div>' +
-      '<div class="poke-strip">' +
-      '<div class="strip-img">' + pokeImg(q.id, 'strip-poke') + '</div>' +
-      '<div class="strip-body">' +
+      '<span class="q-count"><b>' + (stage.index + 1) + '</b>/' + total + '</span>' +
+      '</div>' +
+      '<div class="poke-card">' +
+      '<button class="poke-art" data-act="cry" data-id="' + q.id + '" aria-label="' + pkm.name + ' 울음소리">' +
+      pokeImg(q.id, 'strip-poke') +
+      '<span class="art-badge">' + genLabel(q.id) + '</span>' +
+      '</button>' +
+      '<div class="poke-body">' +
       '<div class="name-row' + nameRowClass(chars.length) + '" id="name-row">' + nameRowHTML(chars, targets, 0) + '</div>' +
       '<div class="strip-hint" id="trace-hint">' + s.tip + '</div>' +
       '</div>' +
@@ -1653,7 +3145,6 @@ window.POKE_DATA = (function () {
       '<canvas class="ink-canvas" role="img" aria-label="따라 쓰기 칸"></canvas>' +
       '<div class="start-dot" id="start-dot" hidden></div>' +
       '<div class="zone-mark" id="zone-mark" aria-hidden="true"></div>' +
-      '<div class="box-glow" aria-hidden="true"></div>' +
       '</div>' +
       '<div class="cover-wrap"><div class="cover-bar" id="cover-bar"></div></div>' +
       '<div class="cover-label" id="cover-label">손가락으로 회색 글자를 따라 그어요</div>' +
@@ -1696,12 +3187,15 @@ window.POKE_DATA = (function () {
 
     initSyllable();
     speakQuestion();
+    /* 다음 문제의 울음소리를 미리 받아 둔다 */
+    var nextQ = stage.questions[stage.index + 1];
+    if (nextQ) Cry.preload(nextQ.id);
   }
 
   function boxSize() {
     /* 화면 위/아래에 늘 있는 것들의 높이를 빼고 남는 만큼만 칸으로 쓴다 */
     var chrome = 0;
-    ['#hud', '.q-top', '.q-bar', '.poke-strip', '.trace-btns'].forEach(function (sel) {
+    ['#hud', '.q-top', '.poke-card', '.cover-wrap', '.cover-label', '.trace-btns'].forEach(function (sel) {
       var el = document.querySelector(sel);
       if (el && el.offsetHeight) chrome += el.offsetHeight;
     });
@@ -1709,7 +3203,7 @@ window.POKE_DATA = (function () {
     var toolsH = tools && tools.offsetHeight ? tools.offsetHeight + 6 : 0;
     var byW = Math.min(window.innerWidth, 560) - 40;
     /* 간격·여백 + 덮은 정도 막대 + 안내 글자 */
-    var byH = window.innerHeight - chrome - 62 - toolsH - 74;
+    var byH = window.innerHeight - chrome - 62 - toolsH - 60;
     return Math.max(150, Math.round(Math.min(byW, byH, 400)));
   }
 
@@ -1828,7 +3322,7 @@ window.POKE_DATA = (function () {
     if (mode === 'blank') return;
 
     /* 아주 옅은 십자 안내선 */
-    ctx.strokeStyle = 'rgba(150, 186, 214, 0.30)';
+    ctx.strokeStyle = 'rgba(255, 176, 208, 0.35)';
     ctx.lineWidth = Math.max(1, size * 0.005);
     ctx.setLineDash([size * 0.02, size * 0.032]);
     ctx.beginPath();
@@ -1841,10 +3335,10 @@ window.POKE_DATA = (function () {
 
     var met = glyphMetrics(ctx, size, ch);
     if (mode === 'faint') {
-      ctx.fillStyle = 'rgba(186, 212, 232, 0.26)';
+      ctx.fillStyle = 'rgba(255, 200, 222, 0.30)';
       ctx.fillText(ch, size / 2, met.y);
       ctx.lineWidth = Math.max(1.5, size * 0.008);
-      ctx.strokeStyle = 'rgba(140, 180, 214, 0.40)';
+      ctx.strokeStyle = 'rgba(238, 160, 194, 0.45)';
       ctx.setLineDash([size * 0.014, size * 0.030]);
       ctx.strokeText(ch, size / 2, met.y);
       ctx.setLineDash([]);
@@ -1852,10 +3346,10 @@ window.POKE_DATA = (function () {
     }
 
     /* strong: 진한 회색 글자 */
-    ctx.fillStyle = 'rgba(178, 204, 228, 0.62)';
+    ctx.fillStyle = 'rgba(214, 206, 224, 0.66)';
     ctx.fillText(ch, size / 2, met.y);
     ctx.lineWidth = Math.max(2, size * 0.012);
-    ctx.strokeStyle = 'rgba(108, 155, 196, 0.90)';
+    ctx.strokeStyle = 'rgba(150, 138, 170, 0.92)';
     ctx.setLineDash([size * 0.030, size * 0.026]);
     ctx.strokeText(ch, size / 2, met.y);
     ctx.setLineDash([]);
@@ -1866,10 +3360,10 @@ window.POKE_DATA = (function () {
     ctx.clearRect(0, 0, size, size);
     if (!ch) return;
     var met = glyphMetrics(ctx, size, ch);
-    ctx.fillStyle = 'rgba(255, 176, 32, 0.30)';
+    ctx.fillStyle = 'rgba(255, 196, 71, 0.32)';
     ctx.fillText(ch, size / 2, met.y);
     ctx.lineWidth = Math.max(2, size * 0.010);
-    ctx.strokeStyle = 'rgba(226, 140, 0, 0.75)';
+    ctx.strokeStyle = 'rgba(240, 160, 10, 0.78)';
     ctx.setLineDash([size * 0.022, size * 0.022]);
     ctx.strokeText(ch, size / 2, met.y);
     ctx.setLineDash([]);
@@ -1895,7 +3389,7 @@ window.POKE_DATA = (function () {
     if (hint && hint.dataset.on === '1') drawHint(hint.getContext('2d'), size, T.char);
     T.mask = buildMask(T.char);
     T.path = buildPath(T.mask);
-    placeStartDot(document.getElementById('box-wrap'), T.cssSize);
+    placeStartDot(T.cssSize);
     if (T.strokes && T.strokes.length) refreshBar();
   }
 
@@ -1907,7 +3401,6 @@ window.POKE_DATA = (function () {
     try {
       document.fonts.load('40px Jua').then(function () {
         redrawGuideNow();
-        /* 글꼴이 늦게 준비되면 마스크가 바뀌므로 검사 기준도 다시 잡는다 */
       }, function () {});
     } catch (e) {}
   }
@@ -1997,7 +3490,6 @@ window.POKE_DATA = (function () {
   function setCoverLabel(cov) {
     var el = document.getElementById('cover-label');
     if (!el || !T) return;
-    var cfg = RECOG[T.stageId] || RECOG[1];
     el.classList.remove('warn');
     if (T.progress >= 0.99) el.textContent = '거의 다 됐어요!';
     else if (cov > 0.02) el.textContent = '조금만 더 써 볼까요?';
@@ -2175,8 +3667,7 @@ window.POKE_DATA = (function () {
     정밀 채점: 세 가지를 함께 본다.
     1) 글자 덮음(coverage) — 가이드 글자 잉크를 잉크가 충분히 덮었는가 (좁은 허용 폭)
     2) 구역 검사(zone) — 글자 상자를 3x3으로 나눠, 잉크가 있는 구역은 모두 채웠는가
-       (받침·모음을 통째로 빠뜨리면 여기서 걸린다)
-    3) 글자 밖 벗어남(off) — 잉크가 글자 허용 범위 밖에 얼마나 많은가 (마구 낙서 걸러내기)
+    3) 글자 밖 벗어남(off) — 잉크가 글자 허용 범위 밖에 얼마나 많은가
   */
   function analyze() {
     if (!T || !T.mask) return null;
@@ -2398,7 +3889,7 @@ window.POKE_DATA = (function () {
     var wrap = document.getElementById('box-wrap');
     if (wrap) wrap.classList.add('done');
     var r = wrap ? wrap.getBoundingClientRect() : null;
-    if (r) confetti(18, { x: r.left + r.width / 2, y: r.top + r.height * 0.42 });
+    if (r) confetti(16, { x: r.left + r.width / 2, y: r.top + r.height * 0.42 });
     Sound.correct();
     T.progress = 1;
     setCoverLabel(1);
@@ -2407,6 +3898,8 @@ window.POKE_DATA = (function () {
     var token = T.token;
     var last = (order >= T.targets.length - 1);
     if (!last) Speech.speak(PRAISE[Math.floor(Math.random() * PRAISE.length)]);
+
+    /* 다음 글자를 미리 그려 두면 넘어갈 때 끊기지 않는다 */
     setTimeout(function () {
       if (!T || T.token !== token) return;
       T.ti = order + 1;
@@ -2420,12 +3913,13 @@ window.POKE_DATA = (function () {
     if (!T) return;
     var token = T.token;
     var pkm = T.pkm;
-    var isNew = catchPokemon(T.q.id);
+    var id = T.q.id;
+    var isNew = catchPokemon(id);
     var nextIndex = T.stageIndex + 1;
 
-    showCatch(T.q.id, pkm, isNew, function () {
+    showCatch(id, pkm, isNew, function () {
       if (!T || T.token !== token) return;
-      if (nextIndex >= T.total) {
+      if (nextIndex >= stage.questions.length) {
         finishStage();
       } else {
         stage.index = nextIndex;
@@ -2443,11 +3937,13 @@ window.POKE_DATA = (function () {
     ov.id = 'catch-overlay';
     ov.innerHTML =
       '<div class="catch-card">' +
+      '<div class="catch-rays" aria-hidden="true"></div>' +
       '<div class="catch-ball"><span class="pb-top"></span><span class="pb-band"></span><span class="pb-btn"></span></div>' +
       '<div class="catch-poke">' + pokeImg(id, 'catch-img') + '</div>' +
       '<div class="catch-name">' + pkm.name + '</div>' +
-      genBadge(id) +
+      '<div class="catch-tags">' + genBadge(id) + typeChipsHTML(id, 'small') + '</div>' +
       '<div class="catch-tag">' + (isNew ? '도감에 담았어요!' : '또 만났네요!') + '</div>' +
+      '<button class="catch-again" data-act="catch-cry" data-id="' + id + '">🔊 다시 듣기</button>' +
       '</div>';
     document.body.appendChild(ov);
     requestAnimationFrame(function () { ov.classList.add('show'); });
@@ -2459,20 +3955,33 @@ window.POKE_DATA = (function () {
       var poke = ov.querySelector('.catch-poke');
       if (poke) poke.classList.add('show');
       Sound.fanfare();
-      confetti(26);
-      Speech.speak(pkm.name + '! 잡았다!', { rate: 0.96 });
-    }, 520);
+      confetti(28);
+      /* 포켓몬 울음소리! 실패하면 한국어 목소리로 대신 */
+      Cry.play(id, function (status) {
+        if (status !== 'ok') Speech.speak(pkm.name + '! 잡았다!', { rate: 0.96 });
+      });
+    }, 560);
 
     var closed = false;
-    var finish = function () {
+    var finish = function (e) {
       if (closed) return;
+      if (e && e.target && e.target.closest && e.target.closest('[data-act="catch-cry"]')) return;
       closed = true;
       ov.classList.remove('show');
       setTimeout(function () { ov.remove(); }, 180);
       if (typeof cb === 'function') cb();
     };
     ov.addEventListener('click', finish);
-    setTimeout(finish, 2100);
+    setTimeout(finish, 2600);
+  }
+
+  function typeChipsHTML(id, extraCls) {
+    var p = POKEMON[id];
+    if (!p) return '';
+    return '<span class="type-chips' + (extraCls ? ' ' + extraCls : '') + '">' +
+      p.types.map(function (t) {
+        return '<span class="type-chip" style="--tc:' + typeColor(t) + '">' + t + '</span>';
+      }).join('') + '</span>';
   }
 
   /* ---------------- 단계 완료 ---------------- */
@@ -2509,8 +4018,8 @@ window.POKE_DATA = (function () {
     var title = gotReward ? '야호! ' + pkm.name + objParticle(pkm.name) + ' 잡았다!' : s.id + '단계 완료!';
 
     main.innerHTML =
-      '<section class="screen reward-screen" style="--theme:' + s.theme + '">' +
-      '<div class="reward-sparks"></div>' +
+      '<section class="screen reward-screen" style="--theme:' + s.theme + ';--theme2:' + s.theme2 + '">' +
+      '<div class="reward-sparks" aria-hidden="true"></div>' +
       '<div class="reward-stage">' +
       '<div class="pokeball" id="reward-ball"><span class="pb-top"></span><span class="pb-band"></span><span class="pb-btn"></span></div>' +
       '<div class="reward-poke" id="reward-poke">' + pokeImg(rewardId, 'reward-img') + '</div>' +
@@ -2520,7 +4029,7 @@ window.POKE_DATA = (function () {
       '<div class="reward-stars">' + starRow(stars) + '</div>' +
       '<div class="reward-sub">' + (showBonus
         ? '모든 단계를 깼어요! 전설의 포켓몬 <b>뮤</b>가 찾아왔어요 ✨'
-        : s.id + '단계 · ' + s.title + ' 성공!' + genBadge(rewardId, 'soft')) + '</div>' +
+        : s.id + '단계 · ' + s.title + ' 성공! ' + genBadge(rewardId, 'soft')) + '</div>' +
       '<div class="reward-btns">' +
       (hasNext
         ? '<button class="big-btn primary" data-act="next-stage" data-id="' + nextId + '">' + nextId + '단계 도전!</button>'
@@ -2544,54 +4053,136 @@ window.POKE_DATA = (function () {
       if (bonus) bonus.classList.add('show');
       Sound.fanfare();
       confetti(40);
-      Speech.speak((gotReward ? pkm.name + objParticle(pkm.name) + ' 잡았다! ' : '') + '대단해! 최고야!', { rate: 0.94 });
+      Cry.play(rewardId, function (status) {
+        if (status !== 'ok') Speech.speak(pkm.name + objParticle(pkm.name) + ' 잡았다! 대단해!', { rate: 0.94 });
+      });
     }, 1000);
     setTimeout(function () { confetti(24, { x: window.innerWidth * 0.2, y: window.innerHeight * 0.35 }); }, 1500);
     setTimeout(function () { confetti(24, { x: window.innerWidth * 0.8, y: window.innerHeight * 0.35 }); }, 1900);
   }
 
   /* ---------------- 도감 ---------------- */
+  var DEX_CHUNK = 60;
+
+  function dexList() {
+    var q = dexState.q.trim().toLowerCase();
+    var qNum = /^[#]?(\d{1,4})$/.exec(q);
+    /* 찾기 중에는 세대를 넘어서 찾는다 */
+    var gen = q ? 0 : dexState.gen;
+    return POKE_IDS.filter(function (id) {
+      if (gen && genOf(id) !== gen) return false;
+      if (!q) return true;
+      var name = POKEMON[id].name.toLowerCase();
+      if (qNum) return String(id) === String(Number(qNum[1]));
+      return name.indexOf(q) !== -1;
+    });
+  }
+
   function goDex() {
+    var fromDex = (view === 'dex');
     view = 'dex';
     stage = null;
     endTrace();
     setHud('나의 포켓몬 도감');
-    var gens = [];
-    POKE_IDS.forEach(function (id) {
-      var g = genOf(id);
-      if (gens.indexOf(g) === -1) gens.push(g);
-    });
-    gens.sort(function (a, b) { return a - b; });
-    var shown = POKE_IDS.filter(function (id) { return !dexFilter || genOf(id) === dexFilter; });
-    var caughtInShown = shown.filter(isCaught).length;
-
+    if (!fromDex) dexState.gen = state.gen;
+    dexState.q = '';
     var html = '<section class="screen dex-screen">' +
       '<div class="dex-head">' +
-      '<div class="dex-count"><b>' + caughtCount() + '</b> / ' + POKE_IDS.length + ' 마리</div>' +
-      '<div class="dex-hint">1세대부터 9세대까지! 잡은 포켓몬을 누르면 이름을 들려줘요</div>' +
+      '<div class="dex-count"><b>' + caughtCount() + '</b> / ' + D.COUNT + ' 마리</div>' +
+      '<div class="dex-progress"><i style="width:' + (caughtCount() / D.COUNT * 100) + '%"></i></div>' +
+      '<div class="dex-hint">잡은 포켓몬을 누르면 이름과 울음소리를 들려줘요</div>' +
       '</div>' +
-      '<div class="dex-filter">' +
-      '<button class="gen-chip' + (!dexFilter ? ' on' : '') + '" data-act="dex-filter" data-gen="0">전체</button>' +
-      gens.map(function (g) {
-        return '<button class="gen-chip' + (dexFilter === g ? ' on' : '') + '" data-act="dex-filter" data-gen="' + g + '" style="--gen:' + (GEN_COLORS[g] || '#495057') + '">' + g + '세대</button>';
+      '<div class="gen-picker dex-gens" role="group" aria-label="세대 고르기">' +
+      '<button class="gen-chip' + (!dexState.gen ? ' on' : '') + '" data-act="dex-gen" data-gen="0">전체</button>' +
+      Array.apply(null, Array(9)).map(function (_, k) {
+        var g = k + 1;
+        return '<button class="gen-chip' + (dexState.gen === g ? ' on' : '') + '" data-act="dex-gen" data-gen="' + g + '" style="--gen:' + GEN_COLORS[g] + '">' +
+          g + '세대<em>' + (D.GEN_COUNT[g] || 0) + '</em></button>';
       }).join('') +
       '</div>' +
-      (dexFilter ? '<div class="dex-filter-note">' + dexFilter + '세대 · ' + caughtInShown + ' / ' + shown.length + ' 마리</div>' : '') +
-      '<div class="dex-grid">';
-    shown.forEach(function (id) {
-      var got = isCaught(id);
-      html += '<button class="dex-item' + (got ? ' got' : '') + '" data-act="dex-item" data-id="' + id + '" aria-label="' + (got ? POKEMON[id].name + ' ' + genLabel(id) : '아직 못 만난 포켓몬') + '">' +
-        '<span class="dex-img-wrap">' + pokeImg(id, 'dex-img') + genBadge(id, 'corner') + '</span>' +
-        '<span class="dex-name">' + (got ? POKEMON[id].name : '???') + '</span>' +
-        '</button>';
-    });
-    html += '</div>' +
+      '<div class="dex-search"><span>🔍</span><input id="dex-search" type="search" inputmode="search" placeholder="이름이나 번호로 찾기" autocomplete="off" aria-label="포켓몬 찾기"></div>' +
+      '<div class="dex-filter-note" id="dex-note"></div>' +
+      '<div class="dex-grid" id="dex-grid"></div>' +
+      '<button class="dex-more" id="dex-more" data-act="dex-more" hidden>더 보기</button>' +
       '<div class="dex-btns">' +
       '<button class="ghost-btn" data-act="map">모험 지도</button>' +
       '<button class="ghost-btn" data-act="home">처음으로</button>' +
       '</div>' +
       '</section>';
     main.innerHTML = html;
+    renderDexGrid(true);
+    var input = document.getElementById('dex-search');
+    if (input) {
+      input.addEventListener('input', function () {
+        dexState.q = input.value;
+        renderDexGrid(true);
+      });
+    }
+    main.scrollTop = 0;
+  }
+
+  function renderDexGrid(reset) {
+    var grid = document.getElementById('dex-grid');
+    var more = document.getElementById('dex-more');
+    var note = document.getElementById('dex-note');
+    if (!grid) return;
+    if (reset) {
+      dexState.list = dexList();
+      dexState.shown = 0;
+      grid.innerHTML = '';
+    }
+    if (!dexState.list) dexState.list = dexList();
+    var list = dexState.list;
+    var end = Math.min(dexState.shown + DEX_CHUNK, list.length);
+    var html = '';
+    for (var i = dexState.shown; i < end; i++) {
+      var id = list[i];
+      var got = isCaught(id);
+      html += '<button class="dex-item' + (got ? ' got' : '') + '" data-act="dex-item" data-id="' + id + '" ' +
+        'aria-label="' + (got ? POKEMON[id].name + ' ' + genLabel(id) : '아직 못 만난 포켓몬') + '">' +
+        '<span class="dex-img-wrap">' + pokeImg(id, 'dex-img', { sprite: true, alt: got ? POKEMON[id].name : '???' }) + '</span>' +
+        '<span class="dex-name">' + (got ? POKEMON[id].name : '???') + '</span>' +
+        '<span class="dex-no">#' + String(id).padStart(4, '0') + '</span>' +
+        '</button>';
+    }
+    grid.insertAdjacentHTML('beforeend', html);
+    dexState.shown = end;
+    if (note) {
+      var caught = caughtOf(list);
+      note.textContent = (dexState.q ? '찾은 포켓몬 ' + list.length + '마리 · ' : '') + '잡은 ' + caught + ' / ' + list.length + '마리';
+    }
+    if (more) more.hidden = dexState.shown >= list.length;
+  }
+
+  function openDexDetail(id) {
+    var old = document.getElementById('dex-detail');
+    if (old) old.remove();
+    var p = POKEMON[id];
+    var got = isCaught(id);
+    var ov = document.createElement('div');
+    ov.className = 'detail-overlay';
+    ov.id = 'dex-detail';
+    ov.innerHTML =
+      '<div class="detail-card" role="dialog" aria-modal="true" aria-label="' + p.name + '">' +
+      '<button class="detail-close" data-act="close-detail" aria-label="닫기">✕</button>' +
+      '<div class="detail-art">' + pokeImg(id, 'detail-img') + '</div>' +
+      '<div class="detail-no">No.' + String(id).padStart(4, '0') + '</div>' +
+      '<div class="detail-name">' + (got ? p.name : '???') + '</div>' +
+      '<div class="detail-tags">' + genBadge(id) + typeChipsHTML(id) + '</div>' +
+      (got
+        ? '<button class="big-btn cry-btn" data-act="detail-cry" data-id="' + id + '">🔊 울음소리 듣기</button>'
+        : '<div class="detail-lock">아직 만나지 못했어요!<br>이름을 다 쓰면 도감에 담겨요</div>') +
+      '</div>';
+    document.body.appendChild(ov);
+    requestAnimationFrame(function () { ov.classList.add('show'); });
+    if (got) Cry.preload(id);
+  }
+
+  function closeDexDetail() {
+    var ov = document.getElementById('dex-detail');
+    if (!ov) return;
+    ov.classList.remove('show');
+    setTimeout(function () { ov.remove(); }, 180);
   }
 
   /* ---------------- 보호자 메뉴 ---------------- */
@@ -2604,12 +4195,13 @@ window.POKE_DATA = (function () {
     overlay.innerHTML =
       '<div class="modal" role="dialog" aria-modal="true" aria-label="보호자 메뉴">' +
       '<div class="modal-title">보호자 메뉴</div>' +
-      '<div class="parent-stats">진행한 단계 <b>' + clearedCount() + ' / ' + STAGES.length + '</b> · 모은 별 <b>⭐' + totalStars() + '</b> · 잡은 포켓몬 <b>' + caughtCount() + '마리</b></div>' +
+      '<div class="parent-stats">진행한 단계 <b>' + clearedCount() + ' / ' + STAGES.length + '</b><br>' +
+      '모은 별 <b>⭐' + totalStars() + '</b> · 잡은 포켓몬 <b>' + caughtCount() + ' / ' + D.COUNT + '</b></div>' +
       '<button class="modal-btn" data-act="sound">' + (state.muted ? '🔇 소리 켜기' : '🔊 소리 끄기') + '</button>' +
       '<button class="modal-btn" data-act="unlock-all">🔓 전체 단계 열기</button>' +
       '<button class="modal-btn danger" data-act="reset-all">🧹 진행 기록 지우기</button>' +
       '<button class="modal-btn plain" data-act="close-parent">닫기</button>' +
-      '<div class="modal-note">진행 상황은 이 기기(브라우저)에만 저장돼요.</div>' +
+      '<div class="modal-note">진행 상황은 이 기기(브라우저)에만 저장돼요.<br>울음소리는 인터넷에서 받아 와요.</div>' +
       '</div>';
     document.body.appendChild(overlay);
     requestAnimationFrame(function () { overlay.classList.add('show'); });
@@ -2621,14 +4213,14 @@ window.POKE_DATA = (function () {
     setTimeout(function () { overlay.remove(); }, 200);
   }
 
-  /* ---------------- 문제 음성 ---------------- */
+  /* ---------------- 음성 안내 ---------------- */
   function speakQuestion() {
     if (!T) return;
     var target = T.char || T.chars[T.targets[0]];
     if (T.guide === 'blank') {
       Speech.speak(T.pkm.name + '! 혼자서 써 볼까요?', { rate: 0.86 });
     } else {
-      Speech.speak(T.pkm.name + '! ' + target + '를 따라 써 봐요', { rate: 0.86 });
+      Speech.speak(T.pkm.name + '! ' + target + josa(target, '을', '를') + ' 따라 써 봐요', { rate: 0.86 });
     }
   }
 
@@ -2697,7 +4289,7 @@ window.POKE_DATA = (function () {
     if (!t) return;
     var act = t.getAttribute('data-act');
 
-    if (act !== 'answer' && act !== 'dex-item' && act !== 'dex-filter') Sound.tap();
+    if (act !== 'answer' && act !== 'dex-item' && act !== 'dex-gen' && act !== 'cry' && act !== 'catch-cry' && act !== 'detail-cry') Sound.tap();
 
     switch (act) {
       case 'start':
@@ -2713,6 +4305,13 @@ window.POKE_DATA = (function () {
         if (view === 'quiz') goMap();
         else goHome();
         break;
+      case 'pick-gen': {
+        var g = Number(t.getAttribute('data-gen')) || 0;
+        state.gen = g;
+        saveState();
+        goMap();
+        break;
+      }
       case 'stage': {
         var id = Number(t.getAttribute('data-id'));
         if (t.getAttribute('data-locked') === '1') {
@@ -2730,6 +4329,14 @@ window.POKE_DATA = (function () {
       case 'replay':
         if (view === 'quiz') speakHint();
         break;
+      case 'cry': {
+        if (!T) break;
+        var cid = Number(t.getAttribute('data-id')) || T.q.id;
+        Cry.play(cid, function (status) {
+          if (status === 'fail') Speech.speak(POKEMON[cid].name);
+        });
+        break;
+      }
       case 'done':
         manualDone();
         break;
@@ -2742,22 +4349,41 @@ window.POKE_DATA = (function () {
       case 'dex':
         goDex();
         break;
-      case 'dex-filter': {
-        dexFilter = Number(t.getAttribute('data-gen')) || 0;
+      case 'dex-gen': {
+        dexState.gen = Number(t.getAttribute('data-gen')) || 0;
+        state.gen = dexState.gen;
+        saveState();
         goDex();
         break;
       }
+      case 'dex-more':
+        renderDexGrid(false);
+        break;
       case 'dex-item': {
         var pid = Number(t.getAttribute('data-id'));
-        if (isCaught(pid)) {
-          Sound.pop();
-          t.classList.add('pulse');
-          setTimeout(function () { t.classList.remove('pulse'); }, 600);
-          Speech.speak(POKEMON[pid].name);
-        } else {
+        if (isCaught(pid)) openDexDetail(pid);
+        else {
           Sound.nudge();
           Speech.speak('아직 만나지 못했어요');
+          openDexDetail(pid);
         }
+        break;
+      }
+      case 'close-detail':
+        closeDexDetail();
+        break;
+      case 'detail-cry': {
+        var did = Number(t.getAttribute('data-id'));
+        Cry.play(did, function (status) {
+          if (status === 'fail') Speech.speak(POKEMON[did].name);
+        });
+        break;
+      }
+      case 'catch-cry': {
+        var kid = Number(t.getAttribute('data-id'));
+        Cry.play(kid, function (status) {
+          if (status === 'fail') Speech.speak(POKEMON[kid].name);
+        });
         break;
       }
       case 'parent':
@@ -2808,9 +4434,11 @@ window.POKE_DATA = (function () {
   document.addEventListener('click', function (e) {
     var overlay = document.getElementById('parent-modal');
     if (overlay && e.target === overlay) closeParent();
+    var detail = document.getElementById('dex-detail');
+    if (detail && e.target === detail) closeDexDetail();
   });
 
-  /* 화면 크기가 바뀌면 칸 크기와 글자를 다시 맞춘다 */
+  /* 화면 크기가 바뮌면 칸 크기와 글자를 다시 맞춘다 */
   var resizeTimer = null;
   window.addEventListener('resize', function () {
     if (!T) return;
@@ -2850,7 +4478,7 @@ window.POKE_DATA = (function () {
   if (location.hash.indexOf('debug') !== -1) {
     window.__trace = {
       info: function () {
-        if (!T) return null;
+        if (!T) return { view: view, stage: stage ? stage.data.id : 0, q: stage ? stage.index : -1, locked: true, ti: -1, caught: caughtCount() };
         var box = document.getElementById('box-wrap');
         var r = box ? box.getBoundingClientRect() : null;
         return {
@@ -2862,13 +4490,15 @@ window.POKE_DATA = (function () {
           ti: T.ti,
           guide: T.guide,
           targets: T.targets.length,
-          cov: Number(T.cov.toFixed(3)),
+          cov: Number((T.cov || 0).toFixed(3)),
           need: (RECOG[T.stageId] || RECOG[1]).cov,
           strokes: T.strokes.length,
           locked: T.locked,
           hints: stage ? stage.hints : 0,
           clears: stage ? stage.clears : 0,
-          caught: state.caught.length,
+          caught: caughtCount(),
+          pokemon: T.q.id,
+          name: T.pkm.name,
           box: r ? { x: Math.round(r.left), y: Math.round(r.top), w: Math.round(r.width), h: Math.round(r.height) } : null
         };
       },
@@ -2905,7 +4535,32 @@ window.POKE_DATA = (function () {
       goto: function (sid) { startStage(sid); },
       unlockAll: function () { state.unlocked = STAGES.length; saveState(); },
       need: function () { return (T && (RECOG[T.stageId] || RECOG[1])) || null; },
-      recog: RECOG
+      recog: RECOG,
+      pool: function (sid, gen) { return stagePool(sid, gen === undefined ? state.gen : gen).length; },
+      poolIds: function (sid, gen) { return stagePool(sid, gen === undefined ? state.gen : gen); },
+      lastCry: function () { return Cry.last; },
+      lastSpeech: function () { return Speech.last; },
+      cryFail: function (on) { Cry.forceFail = !!on; },
+      setGen: function (g) { state.gen = Number(g) || 0; saveState(); },
+      questions: function () { return stage ? stage.questions.map(function (q) { return q.id; }) : []; },
+      caughtIds: function () { return state.caught.slice(); },
+      clearStorage: function () { try { localStorage.removeItem(KEY); } catch (e) {} },
+      dexShown: function () { return { shown: dexState.shown, total: (dexState.list || []).length }; },
+      dexSearch: function (text) {
+        var input = document.getElementById('dex-search');
+        if (!input) return false;
+        input.value = text;
+        dexState.q = text;
+        renderDexGrid(true);
+        return true;
+      },
+      openDexDetail: openDexDetail,
+      previewQuestion: function (id, sid) {
+        var s = STAGES.filter(function (x) { return x.id === (sid || 1); })[0];
+        stage = { data: s, questions: [{ id: Number(id), trace: s.trace(POKEMON[Number(id)]) }], index: 0, hints: 0, clears: 0 };
+        view = 'quiz';
+        renderQuestion();
+      }
     };
   }
 
