@@ -509,11 +509,17 @@
     for (var i = 0; i < MASK_L * MASK_L; i++) {
       if (data[i * 4 + 3] > 105) { mask[i] = 1; count++; }
     }
-    /* 시작점: 가장 위쪽 잉크 줄의 가장 왼쪽 칸 */
+    /* 시작점: 왼쪽 위에 가장 가까운 잉크 칸 (첫 획이 시작하는 자리) */
     var start = null;
-    for (var y = 0; y < MASK_L && !start; y++) {
+    var bestScore = 1e9;
+    for (var y = 0; y < MASK_L; y++) {
       for (var x = 0; x < MASK_L; x++) {
-        if (mask[y * MASK_L + x]) { start = { x: (x + 0.5) / MASK_L, y: (y + 0.5) / MASK_L }; break; }
+        if (!mask[y * MASK_L + x]) continue;
+        var score = x + y * 1.35;
+        if (score < bestScore) {
+          bestScore = score;
+          start = { x: (x + 0.5) / MASK_L, y: (y + 0.5) / MASK_L };
+        }
       }
     }
     return { mask: mask, ink: count, start: start, L: MASK_L };
