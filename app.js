@@ -648,6 +648,8 @@
 
     T.char = T.chars[T.targets[T.ti]];
     T.cssSize = size;
+    /* 한 글자는 한 가지 크레파스 색으로 쓴다 */
+    T.color = (T.stageId * 3 + T.ti) % 6;
     T.inkCanvas = ink;
     T.inkCtx = ink.getContext('2d');
     T.mask = buildMask(T.char);
@@ -714,7 +716,7 @@
   function beginStroke(p) {
     if (!T || T.locked) return;
     T.drawing = true;
-    T.strokes.push({ color: T.strokes.length % INK_COLORS.length, pts: [p] });
+    T.strokes.push({ color: (T.color || 0), pts: [p] });
     drawDot(p);
     Sound.tap();
   }
